@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle List</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f4f7f2; color: #1f2933; }
+        main { padding: 30px; }
+        section { max-width: 1050px; margin: auto; padding: 28px; background: white; border: 1px solid #d9e2d0; border-radius: 8px; }
+        h1 { margin-top: 0; } .eyebrow { color: #3f6b35; font-weight: bold; text-transform: uppercase; }
+        a, button { padding: 9px 12px; background: #3f6b35; color: white; text-decoration: none; border: 0; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .secondary { background: #e8eee2; color: #2f3a2f; }
+        .top { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+        form { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; padding: 14px; background: #f8fbf6; border: 1px solid #d9e2d0; border-radius: 6px; }
+        input, select { padding: 10px; border: 1px solid #cbd5c0; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #d9e2d0; text-align: left; }
+        th { background: #f4f7f2; color: #2f5d24; }
+        .link { color: #2f5d24; background: transparent; padding: 0; margin-right: 10px; }
+    </style>
+</head>
+<body>
+<main>
+    <section>
+        <div class="top">
+            <div>
+                <p class="eyebrow">Vehicle Management</p>
+                <h1>Registered Vehicles</h1>
+            </div>
+            <a href="vehicle-register.html">Register New Vehicle</a>
+        </div>
+
+        <form>
+            <input type="text" placeholder="Registration number or vehicle type">
+            <select>
+                <option>All statuses</option>
+                <option>AVAILABLE</option>
+                <option>IN_USE</option>
+                <option>UNDER_MAINTENANCE</option>
+                <option>UNAVAILABLE</option>
+            </select>
+            <button type="button">Apply Filter</button>
+            <a class="secondary" href="vehicles-list.html">Clear</a>
+        </form>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Registration No</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Driver</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>WP CAB-1234</td>
+                <td>Safari Jeep</td>
+                <td>6</td>
+                <td>Nimal Perera</td>
+                <td>AVAILABLE</td>
+                <td>
+                    <a class="link" href="vehicle-details.html">View</a>
+                    <a class="link" href="vehicle-edit.html">Edit</a>
+                </td>
+            </tr>
+            <tr>
+                <td>CP VAN-7788</td>
+                <td>Safari Van</td>
+                <td>10</td>
+                <td>Not assigned</td>
+                <td>UNDER_MAINTENANCE</td>
+                <td>
+                    <a class="link" href="vehicle-details.html">View</a>
+                    <a class="link" href="vehicle-edit.html">Edit</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p style="margin-top:20px;"><a class="secondary" href="index.html">Back to Home</a></p>
+    </section>
+</main>
+</body>
+</html>
