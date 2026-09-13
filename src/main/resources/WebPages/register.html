@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Lanka Wild Trails</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
+        .form-card { max-width: 450px; background: white; padding: 25px; margin: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; text-align: center; margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
+        input[type="text"], input[type="email"], input[type="password"], select {
+            width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;
+        }
+        button { width: 100%; background-color: #27ae60; color: white; padding: 10px; border: none; border-radius: 4px; font-size: 1em; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #219150; }
+        .login-link { text-align: center; margin-top: 15px; font-size: 0.85em; }
+        .login-link a { color: #2980b9; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <h2>Create an Account</h2>
+    <form action="/register" method="POST">
+
+        <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <div class="login-link">
+        Already have an account? <a href="login.html">Log in here</a>
+    </div>
+</div>
+
+</body>
+</html>
