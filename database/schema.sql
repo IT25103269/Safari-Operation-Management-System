@@ -16,7 +16,7 @@ CREATE TABLE Users (
                        FullName VARCHAR(100) NOT NULL,
                        Email VARCHAR(100) UNIQUE NOT NULL,
                        PasswordHash VARCHAR(255) NOT NULL,
-                       Role VARCHAR(30) CHECK (Role IN ('Tourist', 'Operations Manager', 'Tour Coordinator', 'Safari Driver', 'Safari Guide', 'Wildlife Officer', 'Cottage Manager')) NOT NULL
+                       Role VARCHAR(30) CHECK (Role IN ('Tourist', 'admin', 'guide','manager')) NOT NULL
 );
 END
 GO
