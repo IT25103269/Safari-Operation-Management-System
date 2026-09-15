@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Safari Packages - Lanka Wild Trails</title>
+    <style>
+        :root {
+            --primary-color: #2e5a27;
+            --accent-color: #d35400;
+            --bg-light: #f8f9fa;
+            --text-dark: #333;
+            --card-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), #2e5a27;
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 0.4rem;
+        }
+
+        input, select {
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn-search {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .package-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .package-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+        }
+
+        .package-header h3 {
+            margin: 0;
+        }
+
+        .package-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #eef5ed;
+            color: var(--primary-color);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-right: 0.4rem;
+            margin-bottom: 0.4rem;
+            font-weight: bold;
+        }
+
+        .package-footer {
+            padding: 1rem 1.5rem;
+            background: #f1f1f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .btn-book {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>Discover Sri Lanka's Wild Wonders</h1>
+    <p>Find and book your custom safari experience</p>
+</div>
+
+<div class="container">
+    <!-- Search and Filter Bar -->
+    <div class="filter-section">
+        <div class="filter-grid">
+            <div class="form-group">
+                <label for="dest">Destination</label>
+                <select id="dest">
+                    <option value="">All Parks</option>
+                    <option value="yala">Yala National Park</option>
+                    <option value="udawalawe">Udawalawe National Park</option>
+                    <option value="wilpattu">Wilpattu National Park</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="animal">Target Wildlife</label>
+                <input type="text" id="animal" placeholder="e.g. Leopard, Elephant">
+            </div>
+
+            <div class="form-group">
+                <label for="maxPrice">Max Price (Rs.)</label>
+                <input type="number" id="maxPrice" placeholder="500">
+            </div>
+
+            <button class="btn-search">Filter Packages</button>
+        </div>
+    </div>
+
+    <!-- Package List -->
+    <div class="package-grid">
+
+        <div class="package-card">
+            <div class="package-header">
+                <h3>Yala Classic Expedition</h3>
+                <small>Yala National Park</small>
+            </div>
+            <div class="package-body">
+                <p>Experience high-density leopard spotting along with sloth bears and crocodiles.</p>
+                <div>
+                    <span class="tag">Leopards</span>
+                    <span class="tag">Sloth Bears</span>
+                    <span class="tag">2 Days</span>
+                </div>
+            </div>
+            <div class="package-footer">
+                <div class="price">Rs.250 <small>/ person</small></div>
+                <button class="btn-book">View Details</button>
+            </div>
+        </div>
+
+        <div class="package-card">
+            <div class="package-header">
+                <h3>Udawalawe Herd Discovery</h3>
+                <small>Udawalawe National Park</small>
+            </div>
+            <div class="package-body">
+                <p>Guaranteed elephant herd sightings and bird watching around the reservoir.</p>
+                <div>
+                    <span class="tag">Elephants</span>
+                    <span class="tag">Birds</span>
+                    <span class="tag">1 Day</span>
+                </div>
+            </div>
+            <div class="package-footer">
+                <div class="price">Rs.120 <small>/ person</small></div>
+                <button class="btn-book">View Details</button>
+            </div>
+        </div>
+
+        <div class="package-card">
+            <div class="package-header">
+                <h3>Wilpattu Wilderness Trail</h3>
+                <small>Wilpattu National Park</small>
+            </div>
+            <div class="package-body">
+                <p>Explore Sri Lanka's largest national park famous for natural lakes (Villus).</p>
+                <div>
+                    <span class="tag">Leopards</span>
+                    <span class="tag">Flora</span>
+                    <span class="tag">3 Days</span>
+                </div>
+            </div>
+            <div class="package-footer">
+                <div class="price">Rs.380 <small>/ person</small></div>
+                <button class="btn-book">View Details</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

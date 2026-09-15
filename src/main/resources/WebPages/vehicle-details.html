@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Details</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f4f7f2; color: #1f2933; }
+        main { padding: 30px; } section { max-width: 900px; margin: auto; padding: 28px; background: white; border: 1px solid #d9e2d0; border-radius: 8px; }
+        .eyebrow { color: #3f6b35; font-weight: bold; text-transform: uppercase; } h1 { margin-top: 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .box, .issue { padding: 14px; background: #f8fbf6; border: 1px solid #d9e2d0; border-radius: 6px; }
+        span { display: block; color: #52624f; font-size: 14px; margin-bottom: 5px; }
+        a, button { display: inline-block; margin-top: 18px; margin-right: 8px; padding: 10px 14px; border: 0; border-radius: 6px; font-weight: bold; text-decoration: none; background: #3f6b35; color: white; }
+        .secondary { background: #e8eee2; color: #2f3a2f; } .danger { background: #b42318; }
+        select { padding: 10px; border: 1px solid #cbd5c0; border-radius: 6px; }
+    </style>
+</head>
+<body>
+<main>
+    <section>
+        <p class="eyebrow">Vehicle Management</p>
+        <h1>WP CAB-1234</h1>
+        <div class="grid">
+            <div class="box"><span>Vehicle ID</span><strong>1</strong></div>
+            <div class="box"><span>Registration Number</span><strong>WP CAB-1234</strong></div>
+            <div class="box"><span>Vehicle Type</span><strong>Safari Jeep</strong></div>
+            <div class="box"><span>Seating Capacity</span><strong>6</strong></div>
+            <div class="box"><span>Assigned Driver</span><strong>Nimal Perera</strong></div>
+            <div class="box"><span>Status</span><strong>AVAILABLE</strong></div>
+        </div>
+
+        <p>
+            <label><strong>Quick Status Update</strong></label>
+            <select><option>AVAILABLE</option><option>IN_USE</option><option>UNDER_MAINTENANCE</option></select>
+            <button type="button">Update Status</button>
+        </p>
+
+        <a class="secondary" href="vehicles-list.html">Back to List</a>
+        <a href="maintenance-form.html">Report Issue</a>
+        <a href="vehicle-edit.html">Edit Vehicle</a>
+        <button class="danger" type="button">Delete Vehicle</button>
+
+        <h2>Maintenance Issues</h2>
+        <div class="issue">
+            <h3>Brake check required</h3>
+            <p>Driver reported weak brake response during last trip.</p>
+            <p><strong>Status:</strong> OPEN | <strong>Priority:</strong> High | <strong>Reported By:</strong> Nimal</p>
+        </div>
+    </section>
+</main>
+</body>
+</html>

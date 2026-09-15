@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Wildlife Sighting - Lanka Wild Trails</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; background: white; padding: 20px; margin: auto; border-radius: 5px; }
+        h2 { color: #2c3e50; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="date"], input[type="time"], select, textarea, input[type="file"] {
+            width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;
+        }
+        button { background-color: #27ae60; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #219150; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Log Wildlife Sighting</h2>
+    <form action="/submit-sighting" method="POST" enctype="multipart/form-data">
+
+        <div class="form-group">
+            <label for="tripId">Trip ID / Booking Ref:</label>
+            <input type="text" id="tripId" name="tripId" placeholder="TRP-1024" required>
+        </div>
+
+        <div class="form-group">
+            <label for="animalName">Animal / Species Name:</label>
+            <input type="text" id="animalName" name="animalName" placeholder="Sri Lankan Leopard" required>
+        </div>
+
+        <div class="form-group">
+            <label for="sightingDate">Date:</label>
+            <input type="date" id="sightingDate" name="sightingDate" required>
+        </div>
+
+        <div class="form-group">
+            <label for="sightingTime">Time:</label>
+            <input type="time" id="sightingTime" name="sightingTime" required>
+        </div>
+
+        <div class="form-group">
+            <label for="park">National Park:</label>
+            <select id="park" name="park" required>
+                <option value="">-- Select Park --</option>
+                <option value="Yala">Yala National Park</option>
+                <option value="Wilpattu">Wilpattu National Park</option>
+                <option value="Udawalawe">Udawalawe National Park</option>
+                <option value="Minneriya">Minneriya National Park</option>
+                <option value="Bundala">Bundala National Park</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location / GPS / Landmark:</label>
+            <input type="text" id="location" name="location" placeholder="Near the Lake..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="photo">Upload Photo:</label>
+            <input type="file" id="photo" name="photo" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label for="notes">Additional Notes:</label>
+            <textarea id="notes" name="notes" rows="3" ></textarea>
+        </div>
+
+        <button type="submit">Submit Sighting Record</button>
+    </form>
+</div>
+
+</body>
+</html>
