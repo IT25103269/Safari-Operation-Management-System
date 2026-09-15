@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Portal - Lanka Wild Trails</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        /* Top Navigation Header */
+        .header-nav {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-nav h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .user-welcome {
+            font-size: 0.95em;
+        }
+
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+
+        /* Container & Grid Layout */
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        .menu-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        /* Menu Action Cards */
+        .menu-card {
+            background: white;
+            width: 280px;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid #27ae60;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .card-icon {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            color: #27ae60;
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .card-description {
+            font-size: 0.88em;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .card-link-text {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<div class="header-nav">
+    <h1>Lanka Wild Trails</h1>
+    <div class="user-welcome">
+        Welcome, <strong>Tourist</strong> |
+        <a href="login.html" class="logout-btn">Logout</a>
+    </div>
+</div>
+
+<!-- Main Menu Options Container -->
+<div class="container">
+    <h2 class="section-title">Tourist Dashboard & Operations Menu</h2>
+
+    <div class="menu-grid">
+
+        <a href="browse-packages.html" class="menu-card">
+            <div>
+                <div class="card-icon">🐘</div>
+                <div class="card-title">Safari Packages</div>
+                <div class="card-description">Browse, filter, and choose national park destinations, animal focus tours, and pricing packages.</div>
+            </div>
+            <div class="card-link-text">Explore Packages &rarr;</div>
+        </a>
+
+        <a href="reserve-cottage.html" class="menu-card">
+            <div>
+                <div class="card-icon">🏡</div>
+                <div class="card-title">Reserve Cottages</div>
+                <div class="card-description">Check real-time park cottage availability and reserve accommodations linked to your safari trips.</div>
+            </div>
+            <div class="card-link-text">Book Accommodations &rarr;</div>
+        </a>
+
+        <a href="view-bookings.html" class="menu-card">
+            <div>
+                <div class="card-icon">📅</div>
+                <div class="card-title">Ongoing Bookings</div>
+                <div class="card-description">View your active safari reservations, schedule dates, allocated drivers, guides, and booking status.</div>
+            </div>
+            <div class="card-link-text">View My Bookings &rarr;</div>
+        </a>
+
+        <a href="wildlife-info.html" class="menu-card">
+            <div>
+                <div class="card-icon">📖</div>
+                <div class="card-title">Wildlife Info Section</div>
+                <div class="card-description">Learn about mammals, birds, and reptiles living across Sri Lankan national parks curated by officers.</div>
+            </div>
+            <div class="card-link-text">Browse Species Guide &rarr;</div>
+        </a>
+
+
+        <a href="approved-sightings.html" class="menu-card">
+            <div>
+                <div class="card-icon">📷</div>
+                <div class="card-title">Wildlife Sightings</div>
+                <div class="card-description">View verified, live animal sightings submitted by safari guides and drivers during recent trips.</div>
+            </div>
+            <div class="card-link-text">View Sighting Cards &rarr;</div>
+        </a>
+
+        <a href="tourist-profile.html" class="menu-card">
+            <div>
+                <div class="card-icon">👤</div>
+                <div class="card-title">My Account Info</div>
+                <div class="card-description">Manage your profile information, contact preferences, update password, and account history.</div>
+            </div>
+            <div class="card-link-text">Edit Account Details &rarr;</div>
+        </a>
+
+    </div>
+</div>
+
+</body>
+</html>

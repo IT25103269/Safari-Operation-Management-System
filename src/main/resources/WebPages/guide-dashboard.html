@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Portal - Lanka Wild Trails</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        /* Navigation Header */
+        .header-nav {
+            background-color: #1e3d59;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-nav h1 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .user-welcome {
+            font-size: 0.9em;
+        }
+
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+
+        /* Container and Card Layout */
+        .container {
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: #1e3d59;
+            margin-bottom: 25px;
+        }
+
+        .menu-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .menu-card {
+            background: white;
+            width: 260px;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid #1e3d59;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .card-icon {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            color: #1e3d59;
+        }
+
+        .card-title {
+            font-size: 1.15em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .card-description {
+            font-size: 0.88em;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .card-link-text {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<div class="header-nav">
+    <h1>Lanka Wild Trails — Field Staff Portal</h1>
+    <div class="user-welcome">
+        Role: <strong>Safari Guide</strong> |
+        <a href="login.html" class="logout-btn">Logout</a>
+    </div>
+</div>
+
+<!-- Main Container -->
+<div class="container">
+    <h2 class="section-title">Safari Guide Management Operations</h2>
+
+    <div class="menu-grid">
+
+        <!-- 1. Assigned Bookings & Schedule (Karunawansha R.H.) -->
+        <a href="view-assigned-trips.html" class="menu-card">
+            <div>
+                <div class="card-icon">📋</div>
+                <div class="card-title">My Assigned Bookings</div>
+                <div class="card-description">Check upcoming trip allocations, assigned tourists, tour dates, times, and pickup details.</div>
+            </div>
+            <div class="card-link-text">View Schedule &rarr;</div>
+        </a>
+
+        <!-- 2. Vehicle Info & Status (Kajaahanan I.) -->
+        <a href="view-assigned-vehicles.html" class="menu-card">
+            <div>
+                <div class="card-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1e3d59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.5a1 1 0 0 0-.8.4L2 11l-3.16.86A1 1 0 0 0 -2 12.85V16h3"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
+                </div>
+                <div class="card-title">Assigned Vehicles</div>
+                <div class="card-description">View safari vehicle details allocated to your trips and check current availability status.</div>
+            </div>
+            <div class="card-link-text">Check Vehicle Status &rarr;</div>
+        </a>
+
+        <!-- 3. Wildlife Information Section (Kodikara U.N.) -->
+        <a href="wildlife-info.html" class="menu-card">
+            <div>
+                <div class="card-icon">📖</div>
+                <div class="card-title">Wildlife Information</div>
+                <div class="card-description">Access the species database for facts on animals, birds, and reptiles to assist tourists on tours.</div>
+            </div>
+            <div class="card-link-text">Browse Species Catalog &rarr;</div>
+        </a>
+
+        <a href="log-sighting.html" class="menu-card">
+            <div>
+                <div class="card-icon">🐾</div>
+                <div class="card-title">Log Wildlife Sighting</div>
+                <div class="card-description">Record live animal sightings during active safari tours including location, time, and photo uploads.</div>
+            </div>
+            <div class="card-link-text">Log Sighting &rarr;</div>
+        </a>
+
+        <!-- 5. View Sightings Gallery (Weerakkody W.A.C.L.) -->
+        <a href="approved-sightings.html" class="menu-card">
+            <div>
+                <div class="card-icon">📷</div>
+                <div class="card-title">Sighting Gallery</div>
+                <div class="card-description">Review previously logged wildlife sightings and verified records across different national parks.</div>
+            </div>
+            <div class="card-link-text">View Sightings &rarr;</div>
+        </a>
+
+    </div>
+</div>
+
+</body>
+</html>
