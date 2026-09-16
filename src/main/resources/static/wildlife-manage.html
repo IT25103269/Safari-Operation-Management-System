@@ -407,10 +407,12 @@
 </div>
 
 <script>
+    let editingId = null;
     let editingSpeciesId = null;
 
-    let localRecords = [
+    let speciesList = [
         {
+            id: 1,
             speciesId: 1,
             commonName: "Sri Lankan Leopard",
             scientificName: "Panthera pardus kotiya",
@@ -580,6 +582,8 @@
         }
     ];
 
+    let localRecords = speciesList;
+
     async function loadTableData() {
         if (window.location.protocol.startsWith('http')) {
             try {
@@ -587,17 +591,18 @@
                 if (res.ok) {
                     const data = await res.json();
                     if (Array.isArray(data) && data.length > 0) {
-                        localRecords = data;
+                        speciesList = data.map(s => ({ id: s.speciesId || s.id, ...s }));
+                        localRecords = speciesList;
                     }
                 }
             } catch (e) {
                 console.log("Using local mock dataset for demonstration.");
             }
         }
-        renderTable(localRecords);
+        renderTable();
     }
 
-    function renderTable(list, highlightId = null) {
+    function renderTable(list = speciesList, highlightId = null) {
         const tbody = document.getElementById('speciesTableBody');
         if (!list || list.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #666; padding: 25px;">No species records found matching your filter.</td></tr>`;
@@ -605,12 +610,13 @@
         }
 
         tbody.innerHTML = list.map(s => {
-            const isBeingEdited = editingSpeciesId === s.speciesId;
-            const isRecentlyUpdated = highlightId === s.speciesId;
+            const sid = s.id || s.speciesId;
+            const isBeingEdited = editingId === sid;
+            const isRecentlyUpdated = highlightId === sid;
             const rowClass = isBeingEdited ? 'row-editing' : (isRecentlyUpdated ? 'row-updated' : '');
 
             return `
-            <tr class="${rowClass}" id="species-row-${s.speciesId}">
+            <tr class="${rowClass}" id="species-row-${sid}">
                 <td><img class="thumbnail" src="${s.imageUrl || 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=100'}" alt="${s.commonName}" onerror="this.src='https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=100'"></td>
                 <td><strong>${s.commonName}</strong><br><small style="color: #666; font-style: italic;">${s.scientificName}</small></td>
                 <td>${s.category}</td>
@@ -618,8 +624,8 @@
                 <td><span class="badge ${s.conservationStatus === 'Endangered' ? 'badge-endangered' : ''}">${s.conservationStatus}</span></td>
                 <td><span class="badge ${s.status === 'Active' ? 'badge-active' : 'badge-archived'}">${s.status || 'Active'}</span></td>
                 <td class="action-btns">
-                    <button type="button" class="btn-edit" onclick="populateEdit(${s.speciesId})">${isBeingEdited ? 'Editing...' : 'Edit'}</button>
-                    <button type="button" class="btn-danger" onclick="archiveSpecies(${s.speciesId})">Archive</button>
+                    <button type="button" class="btn-edit" onclick="populateEdit(${sid})">${isBeingEdited ? 'Editing...' : 'Edit'}</button>
+                    <button type="button" class="btn-danger" onclick="archiveSpecies(${sid})">Archive</button>
                 </td>
             </tr>
             `;
@@ -634,13 +640,14 @@
     }
 
     function populateEdit(id) {
-        const item = localRecords.find(x => x.speciesId === id);
+        const item = speciesList.find(s => (s.id === id || s.speciesId === id));
         if (!item) return;
 
+        editingId = id;
         editingSpeciesId = id;
 
         // Populate every form field
-        document.getElementById('speciesId').value = item.speciesId;
+        document.getElementById('speciesId').value = id;
         document.getElementById('commonName').value = item.commonName || '';
         document.getElementById('scientificName').value = item.scientificName || '';
         document.getElementById('category').value = item.category || 'Mammal';
@@ -660,26 +667,28 @@
         submitBtn.classList.add('btn-update');
 
         const editNotice = document.getElementById('editNotice');
-        document.getElementById('editNoticeText').innerHTML = `<strong>Editing Mode:</strong> Updating species <em>${item.commonName}</em> (ID: #${item.speciesId})`;
+        document.getElementById('editNoticeText').innerHTML = `<strong>Editing Mode:</strong> Updating species <em>${item.commonName}</em> (ID: #${id})`;
         editNotice.style.display = 'block';
 
         document.getElementById('cancelEditBtn').style.display = 'inline-block';
 
         // Highlight the row in the table
-        renderTable(localRecords);
+        renderTable();
 
         // Smoothly scroll to the form
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function cancelEdit() {
+        editingId = null;
         editingSpeciesId = null;
         resetForm();
-        renderTable(localRecords);
+        renderTable();
         showAlert("Editing mode cancelled.");
     }
 
     function resetForm() {
+        editingId = null;
         editingSpeciesId = null;
         document.getElementById('speciesForm').reset();
         document.getElementById('speciesId').value = "0";
@@ -696,11 +705,11 @@
     }
 
     async function archiveSpecies(id) {
-        const item = localRecords.find(s => s.speciesId === id);
+        const item = speciesList.find(s => (s.id === id || s.speciesId === id));
         const name = item ? item.commonName : "this species";
         if (!confirm(`Are you sure you want to archive "${name}"?`)) return;
 
-        if (editingSpeciesId === id) {
+        if (editingId === id) {
             cancelEdit();
         }
 
@@ -712,14 +721,15 @@
             }
         }
 
-        localRecords = localRecords.filter(s => s.speciesId !== id);
-        renderTable(localRecords);
+        speciesList = speciesList.filter(s => (s.id !== id && s.speciesId !== id));
+        localRecords = speciesList;
+        renderTable();
         showAlert(`Archived "${name}" successfully.`);
     }
 
     function filterTable() {
         const q = document.getElementById('tableFilter').value.toLowerCase().trim();
-        const filtered = localRecords.filter(s =>
+        const filtered = speciesList.filter(s =>
             s.commonName.toLowerCase().includes(q) ||
             s.scientificName.toLowerCase().includes(q) ||
             s.primaryPark.toLowerCase().includes(q) ||
@@ -736,15 +746,10 @@
     }
 
     // Form Submit Listener: Handles both In-Place Update and New Registration
-    document.getElementById('speciesForm').addEventListener('submit', async function(e) {
+    document.getElementById('speciesForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        const speciesIdVal = parseInt(document.getElementById('speciesId').value) || 0;
-        const isEditing = (editingSpeciesId !== null && editingSpeciesId > 0) || (speciesIdVal > 0);
-        const targetId = isEditing ? (editingSpeciesId || speciesIdVal) : null;
-
-        const speciesData = {
-            speciesId: targetId,
+        const formData = {
             commonName: document.getElementById('commonName').value.trim(),
             scientificName: document.getElementById('scientificName').value.trim(),
             category: document.getElementById('category').value,
@@ -758,29 +763,23 @@
             status: "Active"
         };
 
-        let updatedId = null;
-
-        if (isEditing) {
-            // Find and update existing species in local array
-            const existingIdx = localRecords.findIndex(x => x.speciesId === targetId);
-            if (existingIdx >= 0) {
-                localRecords[existingIdx] = {
-                    ...localRecords[existingIdx],
-                    ...speciesData,
-                    speciesId: targetId
-                };
-                updatedId = targetId;
-                showAlert(`✅ Species "${speciesData.commonName}" updated successfully!`);
+        if (editingId !== null && editingId > 0) {
+            // Update existing item
+            const index = speciesList.findIndex(s => s.id === editingId || s.speciesId === editingId);
+            if (index !== -1) {
+                speciesList[index] = { ...speciesList[index], ...formData, id: editingId, speciesId: editingId };
+                renderTable(speciesList, editingId); // அட்டவணையை மீண்டும் வரையும்
+                showAlert(`✅ "${formData.commonName}" updated successfully!`);
             }
         } else {
-            // Register new species
-            const nextId = (localRecords.length > 0) 
-                ? Math.max(...localRecords.map(x => x.speciesId || 0)) + 1 
+            // Register new item
+            const newId = (speciesList.length > 0) 
+                ? Math.max(...speciesList.map(s => s.id || s.speciesId || 0)) + 1 
                 : 1;
-            speciesData.speciesId = nextId;
-            localRecords.unshift(speciesData);
-            updatedId = nextId;
-            showAlert(`✅ New species "${speciesData.commonName}" registered successfully!`);
+            const newSpecies = { id: newId, speciesId: newId, ...formData };
+            speciesList.unshift(newSpecies);
+            renderTable(speciesList, newId); // அட்டவணையை மீண்டும் வரையும்
+            showAlert(`✅ New species "${formData.commonName}" registered successfully!`);
         }
 
         // If connected to Spring Boot server, sync in background
@@ -789,8 +788,8 @@
                 fetch('/api/wildlife', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(speciesData)
-                });
+                    body: JSON.stringify(editingId ? { ...formData, id: editingId, speciesId: editingId } : formData)
+                }).catch(() => {});
             } catch (err) {
                 console.log("Local offline mode active.");
             }
@@ -798,9 +797,6 @@
 
         // Reset form to default Add mode
         resetForm();
-
-        // Re-render table and highlight the updated/new row without page reload
-        renderTable(localRecords, updatedId);
     });
 
     document.addEventListener('DOMContentLoaded', loadTableData);
