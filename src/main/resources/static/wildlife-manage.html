@@ -427,6 +427,7 @@
             status: "Active"
         },
         {
+            id: 2,
             speciesId: 2,
             commonName: "Asian Elephant",
             scientificName: "Elephas maximus maximus",
@@ -441,6 +442,7 @@
             status: "Active"
         },
         {
+            id: 3,
             speciesId: 3,
             commonName: "Sri Lankan Sloth Bear",
             scientificName: "Melursus ursinus inornatus",
@@ -455,6 +457,7 @@
             status: "Active"
         },
         {
+            id: 4,
             speciesId: 4,
             commonName: "Mugger Crocodile",
             scientificName: "Crocodylus palustris",
@@ -469,6 +472,7 @@
             status: "Active"
         },
         {
+            id: 5,
             speciesId: 5,
             commonName: "Sri Lanka Blue Magpie",
             scientificName: "Urocissa ornata",
@@ -483,6 +487,7 @@
             status: "Active"
         },
         {
+            id: 6,
             speciesId: 6,
             commonName: "Sri Lanka Junglefowl",
             scientificName: "Gallus lafayettii",
@@ -497,6 +502,7 @@
             status: "Active"
         },
         {
+            id: 7,
             speciesId: 7,
             commonName: "Sambar Deer",
             scientificName: "Rusa unicolor unicolor",
@@ -511,6 +517,7 @@
             status: "Active"
         },
         {
+            id: 8,
             speciesId: 8,
             commonName: "Sri Lankan Spotted Deer",
             scientificName: "Axis axis ceylonensis",
@@ -525,6 +532,7 @@
             status: "Active"
         },
         {
+            id: 9,
             speciesId: 9,
             commonName: "Spot-billed Pelican",
             scientificName: "Pelecanus philippensis",
@@ -539,6 +547,7 @@
             status: "Active"
         },
         {
+            id: 10,
             speciesId: 10,
             commonName: "Purple-faced Langur",
             scientificName: "Semnopithecus vetulus",
@@ -553,6 +562,7 @@
             status: "Active"
         },
         {
+            id: 11,
             speciesId: 11,
             commonName: "Crested Serpent Eagle",
             scientificName: "Spilornis cheela",
@@ -567,6 +577,7 @@
             status: "Active"
         },
         {
+            id: 12,
             speciesId: 12,
             commonName: "Green Pit Viper",
             scientificName: "Craspedocephalus trigonocephalus",
@@ -764,34 +775,42 @@
         };
 
         if (editingId !== null && editingId > 0) {
-            // Update existing item
-            const index = speciesList.findIndex(s => s.id === editingId || s.speciesId === editingId);
+            // update logic
+            const index = speciesList.findIndex(s => s.id === editingId);
             if (index !== -1) {
                 speciesList[index] = { ...speciesList[index], ...formData, id: editingId, speciesId: editingId };
-                renderTable(speciesList, editingId); // அட்டவணையை மீண்டும் வரையும்
-                showAlert(`✅ "${formData.commonName}" updated successfully!`);
+                localRecords = speciesList;
+                renderTable(); // அட்டவணையை மீண்டும் வரையும்
             }
+            showAlert(`✅ "${formData.commonName}" updated successfully!`);
         } else {
-            // Register new item
+            // Register new species
             const newId = (speciesList.length > 0) 
                 ? Math.max(...speciesList.map(s => s.id || s.speciesId || 0)) + 1 
                 : 1;
             const newSpecies = { id: newId, speciesId: newId, ...formData };
             speciesList.unshift(newSpecies);
-            renderTable(speciesList, newId); // அட்டவணையை மீண்டும் வரையும்
+            localRecords = speciesList;
+            renderTable(); // அட்டவணையை மீண்டும் வரையும்
             showAlert(`✅ New species "${formData.commonName}" registered successfully!`);
         }
 
-        // If connected to Spring Boot server, sync in background
+        // If connected to Spring Boot server over HTTP/HTTPS, synchronize in background
         if (window.location.protocol.startsWith('http')) {
             try {
                 fetch('/api/wildlife', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(editingId ? { ...formData, id: editingId, speciesId: editingId } : formData)
-                }).catch(() => {});
+                }).then(res => {
+                    if (res && res.ok) {
+                        console.log("Synced species with backend database.");
+                    }
+                }).catch(err => {
+                    console.warn("Backend API not reachable. Local record saved.", err);
+                });
             } catch (err) {
-                console.log("Local offline mode active.");
+                console.warn("Offline or backend unreachable.", err);
             }
         }
 
