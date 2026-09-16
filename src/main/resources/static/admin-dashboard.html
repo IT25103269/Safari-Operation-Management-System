@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Lanka Wild Trails</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
+        .header-nav { background-color: #2c3e50; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-nav h1 { margin: 0; font-size: 1.4em; }
+        .logout-btn { background-color: #e74c3c; color: white; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 0.85em; }
+        .container { max-width: 1050px; margin: 30px auto; padding: 0 20px; }
+        .section-title { color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 8px; margin-bottom: 20px; }
+        .grid { display: flex; flex-wrap: wrap; gap: 20px; }
+        .card { background: white; width: 300px; border-radius: 6px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-top: 4px solid #2980b9; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-title { font-size: 1.1em; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
+        .card-desc { font-size: 0.88em; color: #666; margin-bottom: 15px; }
+        .card-btn { background-color: #2980b9; color: white; text-decoration: none; padding: 8px 12px; border-radius: 4px; font-size: 0.85em; text-align: center; font-weight: bold; }
+        .card-btn:hover { background-color: #1c5980; }
+        .alert-card { border-top-color: #e67e22; }
+    </style>
+</head>
+<body>
+
+<div class="header-nav">
+    <h1>Lanka Wild Trails — Admin Console</h1>
+    <div>
+        User: <strong>Nimal Perera (Operations Manager)</strong> |
+        <a href="login.html" class="logout-btn">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 class="section-title">System Module Overview & Executive Controls</h2>
+
+    <div class="grid">
+        <div class="card alert-card">
+            <div>
+                <div class="card-title">🔑 User & Role Access Control</div>
+                <div class="card-desc">Manage system users, change employee roles, approve internal staff access, and control RBAC privileges.</div>
+            </div>
+            <a href="admin-user-management.html" class="card-btn" style="background-color: #e67e22;">Manage Roles & Users</a>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="card-title">📦 Package Management</div>
+                <div class="card-desc">Create, edit, archive, and price safari tour packages across national park destinations.</div>
+            </div>
+            <a href="manage-packages.html" class="card-btn">Manage Packages</a>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="card-title">🚘 Fleet & Vehicle Status</div>
+                <div class="card-desc">Monitor vehicle availability, register new fleet items, and review driver maintenance logs.</div>
+            </div>
+            <a href="manage-vehicles.html" class="card-btn">Manage Fleet</a>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="card-title">📅 Trip Allocations</div>
+                <div class="card-desc">Review driver, guide, and vehicle trip assignments, resolve schedule conflicts, and prevent double bookings.</div>
+            </div>
+            <a href="manage-allocations.html" class="card-btn">View Allocations</a>
+        </div>
+
+        <a href="manage-cottages.html" class="card" style="text-decoration:none;">
+            <div>
+                <div class="card-title">🏡 Cottage Reservations</div>
+                <div class="card-desc">Monitor park accommodation availability, approve stays, and manage tourist check-ins/check-outs.</div>
+            </div>
+            <span class="card-btn">Manage Cottages</span>
+        </a>
+
+        <div class="card">
+            <div>
+                <div class="card-title">🦁 Wildlife Records & Info</div>
+                <div class="card-desc">Review submitted sighting reports from guides and update species databases managed by Tharushi.</div>
+            </div>
+            <a href="approved-sightings.html" class="card-btn">View Wildlife Data</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
