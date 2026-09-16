@@ -17,14 +17,17 @@
         button:hover { background-color: #1a252f; }
         .register-link { text-align: center; margin-top: 15px; font-size: 0.85em; }
         .register-link a { color: #27ae60; text-decoration: none; }
+        .error-message { color: #e74c3c; background: #fde8e8; padding: 8px; border-radius: 4px; font-size: 0.85em; margin-bottom: 15px; display: none; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="form-card">
     <h2>System Login</h2>
-    <form action="/login" method="POST">
+    <div id="error-message" class="error-message"></div>
 
+    <!-- Added id="loginForm" and removed action/method to let JS handle submission -->
+    <form id="loginForm">
         <div class="form-group">
             <label for="email">Email Address</label>
             <input type="email" id="email" name="email" placeholder="Enter your registered email" required>
@@ -43,5 +46,42 @@
     </div>
 </div>
 
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error-message');
+
+        errorDiv.style.display = 'none';
+        errorDiv.innerText = '';
+
+        const formData = new URLSearchParams();
+        formData.append('email', email);
+        formData.append('password', password);
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                // Redirect user to their role-specific dashboard URL
+                window.location.href = data.redirectUrl;
+            } else {
+                errorDiv.innerText = data.message || 'Login failed.';
+                errorDiv.style.display = 'block';
+            }
+        } catch (err) {
+            errorDiv.innerText = 'Server error. Please try again later.';
+            errorDiv.style.display = 'block';
+        }
+    });
+</script>
 </body>
 </html>

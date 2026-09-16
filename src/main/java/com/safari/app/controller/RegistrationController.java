@@ -34,7 +34,7 @@ public class RegistrationController {
                 return "redirect:/register.html?error=password_mismatch";
             }
 
-            if (userRepository.existsByEmail(email)) {
+            if (userRepository.existsByEmailIgnoreCase(email)) {
                 return "redirect:/register.html?error=email_exists";
             }
 
