@@ -73,6 +73,17 @@
             font-size: 1.3rem;
         }
 
+        .edit-notice-box {
+            display: none;
+            background: #e0f2fe;
+            border-left: 4px solid #0284c7;
+            color: #0369a1;
+            padding: 10px 12px;
+            border-radius: 4px;
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+        }
+
         .form-group {
             margin-bottom: 1rem;
         }
@@ -92,6 +103,13 @@
             border-radius: 4px;
             box-sizing: border-box;
             font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(46, 90, 39, 0.2);
         }
 
         .form-row {
@@ -109,10 +127,18 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 0.9rem;
+            transition: background-color 0.2s;
         }
 
         .btn:hover {
             background-color: var(--primary-dark);
+        }
+
+        .btn-update {
+            background-color: var(--warning-color) !important;
+        }
+        .btn-update:hover {
+            background-color: #b34300 !important;
         }
 
         .btn-secondary {
@@ -121,6 +147,14 @@
         }
         .btn-secondary:hover {
             background-color: #7f8c8d;
+        }
+
+        .btn-cancel {
+            background-color: #64748b;
+            color: white;
+        }
+        .btn-cancel:hover {
+            background-color: #475569;
         }
 
         .btn-danger {
@@ -154,12 +188,28 @@
             text-align: left;
             padding: 0.75rem;
             border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s;
         }
 
         th {
             background-color: #e9efe8;
             color: var(--primary-color);
             font-weight: 600;
+        }
+
+        .row-editing {
+            background-color: #f0f9ff !important;
+            border-left: 4px solid #0284c7;
+        }
+
+        .row-updated {
+            animation: highlightRow 2.5s ease-in-out;
+        }
+
+        @keyframes highlightRow {
+            0% { background-color: #fef08a; }
+            50% { background-color: #dcfce7; }
+            100% { background-color: transparent; }
         }
 
         .badge {
@@ -204,6 +254,7 @@
             border-radius: 4px;
             margin-bottom: 15px;
             font-size: 0.9rem;
+            font-weight: 600;
         }
         .alert-success {
             background-color: #d4edda;
@@ -230,9 +281,14 @@
         <!-- Form to Add or Edit Species -->
         <div class="card">
             <h2 id="formTitle">Register New Wildlife Species</h2>
-            <form id="speciesForm" action="/api/wildlife" method="POST">
+
+            <!-- Notice displayed only when actively editing an existing record -->
+            <div id="editNotice" class="edit-notice-box">
+                <span id="editNoticeText">Editing Mode: Updating Species</span>
+            </div>
+
+            <form id="speciesForm">
                 <input type="hidden" id="speciesId" name="speciesId" value="0">
-                <input type="hidden" id="formAction" name="action" value="save">
 
                 <div class="form-group">
                     <label for="commonName">Common Name *</label>
@@ -313,9 +369,10 @@
                     <textarea id="description" name="description" rows="3" placeholder="Key physical traits, behavior, and field identification notes..."></textarea>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <div style="display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap;">
                     <button type="submit" class="btn" id="submitBtn">Save Species Record</button>
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear</button>
+                    <button type="button" class="btn btn-cancel" id="cancelEditBtn" style="display: none;" onclick="cancelEdit()">Cancel Edit</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear Form</button>
                 </div>
             </form>
         </div>
@@ -342,7 +399,7 @@
                     </tr>
                 </thead>
                 <tbody id="speciesTableBody">
-                    <!-- Dynamic Rows -->
+                    <!-- Dynamic Rows rendered by JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -350,8 +407,12 @@
 </div>
 
 <script>
-    let localRecords = [
+    let editingId = null;
+    let editingSpeciesId = null;
+
+    let speciesList = [
         {
+            id: 1,
             speciesId: 1,
             commonName: "Sri Lankan Leopard",
             scientificName: "Panthera pardus kotiya",
@@ -366,6 +427,7 @@
             status: "Active"
         },
         {
+            id: 2,
             speciesId: 2,
             commonName: "Asian Elephant",
             scientificName: "Elephas maximus maximus",
@@ -380,6 +442,7 @@
             status: "Active"
         },
         {
+            id: 3,
             speciesId: 3,
             commonName: "Sri Lankan Sloth Bear",
             scientificName: "Melursus ursinus inornatus",
@@ -394,6 +457,7 @@
             status: "Active"
         },
         {
+            id: 4,
             speciesId: 4,
             commonName: "Mugger Crocodile",
             scientificName: "Crocodylus palustris",
@@ -408,6 +472,7 @@
             status: "Active"
         },
         {
+            id: 5,
             speciesId: 5,
             commonName: "Sri Lanka Blue Magpie",
             scientificName: "Urocissa ornata",
@@ -422,6 +487,7 @@
             status: "Active"
         },
         {
+            id: 6,
             speciesId: 6,
             commonName: "Sri Lanka Junglefowl",
             scientificName: "Gallus lafayettii",
@@ -436,6 +502,7 @@
             status: "Active"
         },
         {
+            id: 7,
             speciesId: 7,
             commonName: "Sambar Deer",
             scientificName: "Rusa unicolor unicolor",
@@ -450,6 +517,7 @@
             status: "Active"
         },
         {
+            id: 8,
             speciesId: 8,
             commonName: "Sri Lankan Spotted Deer",
             scientificName: "Axis axis ceylonensis",
@@ -464,6 +532,7 @@
             status: "Active"
         },
         {
+            id: 9,
             speciesId: 9,
             commonName: "Spot-billed Pelican",
             scientificName: "Pelecanus philippensis",
@@ -478,6 +547,7 @@
             status: "Active"
         },
         {
+            id: 10,
             speciesId: 10,
             commonName: "Purple-faced Langur",
             scientificName: "Semnopithecus vetulus",
@@ -492,6 +562,7 @@
             status: "Active"
         },
         {
+            id: 11,
             speciesId: 11,
             commonName: "Crested Serpent Eagle",
             scientificName: "Spilornis cheela",
@@ -506,6 +577,7 @@
             status: "Active"
         },
         {
+            id: 12,
             speciesId: 12,
             commonName: "Green Pit Viper",
             scientificName: "Craspedocephalus trigonocephalus",
@@ -521,97 +593,173 @@
         }
     ];
 
+    let localRecords = speciesList;
+
     async function loadTableData() {
-        try {
-            const res = await fetch('/api/wildlife');
-            if (!res.ok) throw new Error("API Offline");
-            const data = await res.json();
-            if (Array.isArray(data) && data.length > 0) {
-                localRecords = data;
+        if (window.location.protocol.startsWith('http')) {
+            try {
+                const res = await fetch('/api/wildlife');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        speciesList = data.map(s => ({ id: s.speciesId || s.id, ...s }));
+                        localRecords = speciesList;
+                    }
+                }
+            } catch (e) {
+                console.log("Using local mock dataset for demonstration.");
             }
-        } catch (e) {
-            console.log("Using local mock dataset for demonstration.");
         }
-        renderTable(localRecords);
+        renderTable();
     }
 
-    function renderTable(list) {
+    function renderTable(list = speciesList, highlightId = null) {
         const tbody = document.getElementById('speciesTableBody');
-        tbody.innerHTML = list.map(s => `
-            <tr>
-                <td><img class="thumbnail" src="${s.imageUrl || 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=100'}" alt="${s.commonName}" onerror="this.src='https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=100'"></td>
-                <td><strong>${s.commonName}</strong><br><small style="color: #666; font-style: italic;">${s.scientificName}</small></td>
-                <td>${s.category}</td>
-                <td>${s.primaryPark}</td>
-                <td><span class="badge ${s.conservationStatus === 'Endangered' ? 'badge-endangered' : ''}">${s.conservationStatus}</span></td>
+        if (!tbody) return;
+
+        const dataToRender = Array.isArray(list) ? list : speciesList;
+        if (!dataToRender || dataToRender.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #666; padding: 25px;">No species records found matching your filter.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataToRender.map(s => {
+            const sid = parseInt(s.id || s.speciesId || 0, 10);
+            const isBeingEdited = (editingId !== null && editingId === sid);
+            const isRecentlyUpdated = (highlightId !== null && highlightId === sid);
+            const rowClass = isBeingEdited ? 'row-editing' : (isRecentlyUpdated ? 'row-updated' : '');
+            const safeImg = (s.imageUrl && s.imageUrl.trim() !== '') 
+                ? s.imageUrl 
+                : 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=100';
+
+            return `
+            <tr class="${rowClass}" id="species-row-${sid}">
+                <td><img class="thumbnail" src="${safeImg}" alt="${s.commonName || 'Wildlife'}" onerror="this.src='https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=100'"></td>
+                <td><strong>${s.commonName || ''}</strong><br><small style="color: #666; font-style: italic;">${s.scientificName || ''}</small></td>
+                <td>${s.category || ''}</td>
+                <td>${s.primaryPark || ''}</td>
+                <td><span class="badge ${s.conservationStatus === 'Endangered' ? 'badge-endangered' : ''}">${s.conservationStatus || ''}</span></td>
                 <td><span class="badge ${s.status === 'Active' ? 'badge-active' : 'badge-archived'}">${s.status || 'Active'}</span></td>
                 <td class="action-btns">
-                    <button type="button" class="btn-edit" onclick="populateEdit(${s.speciesId})">Edit</button>
-                    <button type="button" class="btn-danger" onclick="archiveSpecies(${s.speciesId})">Archive</button>
+                    <button type="button" class="btn-edit" onclick="populateEdit(${sid})">${isBeingEdited ? 'Editing...' : 'Edit'}</button>
+                    <button type="button" class="btn-danger" onclick="archiveSpecies(${sid})">Archive</button>
                 </td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
+
+        if (highlightId) {
+            setTimeout(() => {
+                const row = document.getElementById(`species-row-${highlightId}`);
+                if (row) {
+                    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 50);
+        }
     }
 
     function populateEdit(id) {
-        const item = localRecords.find(x => x.speciesId === id);
+        const item = speciesList.find(s => (s.id === id || s.speciesId === id));
         if (!item) return;
 
-        document.getElementById('speciesId').value = item.speciesId;
-        document.getElementById('commonName').value = item.commonName;
-        document.getElementById('scientificName').value = item.scientificName;
-        document.getElementById('category').value = item.category;
-        document.getElementById('conservationStatus').value = item.conservationStatus;
-        document.getElementById('primaryPark').value = item.primaryPark;
+        editingId = id;
+        editingSpeciesId = id;
+
+        // Populate every form field
+        document.getElementById('speciesId').value = id;
+        document.getElementById('commonName').value = item.commonName || '';
+        document.getElementById('scientificName').value = item.scientificName || '';
+        document.getElementById('category').value = item.category || 'Mammal';
+        document.getElementById('conservationStatus').value = item.conservationStatus || 'Least Concern';
+        document.getElementById('primaryPark').value = item.primaryPark || 'Yala';
         document.getElementById('dietaryHabit').value = item.dietaryHabit || 'Carnivore';
         document.getElementById('habitat').value = item.habitat || '';
         document.getElementById('bestSpottingTime').value = item.bestSpottingTime || '';
         document.getElementById('imageUrl').value = item.imageUrl || '';
         document.getElementById('description').value = item.description || '';
 
-        document.getElementById('formTitle').innerText = `Edit: ${item.commonName}`;
-        document.getElementById('submitBtn').innerText = "Update Species";
+        // Activate Visual Editing Mode
+        document.getElementById('formTitle').innerText = `✏️ Edit: ${item.commonName}`;
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerText = "Update Species Record";
+        submitBtn.classList.add('btn-update');
+
+        const editNotice = document.getElementById('editNotice');
+        document.getElementById('editNoticeText').innerHTML = `<strong>Editing Mode:</strong> Updating species <em>${item.commonName}</em> (ID: #${id})`;
+        editNotice.style.display = 'block';
+
+        document.getElementById('cancelEditBtn').style.display = 'inline-block';
+
+        // Highlight the row in the table
+        renderTable();
+
+        // Smoothly scroll to the form
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function cancelEdit() {
+        editingId = null;
+        editingSpeciesId = null;
+        resetForm();
+        renderTable();
+        showAlert("Editing mode cancelled.");
+    }
+
     function resetForm() {
+        editingId = null;
+        editingSpeciesId = null;
         document.getElementById('speciesForm').reset();
         document.getElementById('speciesId').value = "0";
+
+        // Reset UI labels and buttons
         document.getElementById('formTitle').innerText = "Register New Wildlife Species";
-        document.getElementById('submitBtn').innerText = "Save Species Record";
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerText = "Save Species Record";
+        submitBtn.classList.remove('btn-update');
+
+        document.getElementById('editNotice').style.display = 'none';
+        document.getElementById('cancelEditBtn').style.display = 'none';
     }
 
     async function archiveSpecies(id) {
-        if (!confirm("Are you sure you want to archive this species record?")) return;
+        const item = speciesList.find(s => (s.id === id || s.speciesId === id));
+        const name = item ? item.commonName : "this species";
+        if (!confirm(`Are you sure you want to archive "${name}"?`)) return;
 
-        try {
-            const formData = new URLSearchParams();
-            formData.append('action', 'archive');
-            formData.append('speciesId', id);
-
-            const res = await fetch('/api/wildlife', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
-                body: formData
-            });
-            if (res.ok) {
-                showAlert("Species archived successfully.");
-            }
-        } catch (err) {
-            showAlert("Species archived (offline mode).");
+        if (editingId === id) {
+            cancelEdit();
         }
 
-        localRecords = localRecords.filter(s => s.speciesId !== id);
-        renderTable(localRecords);
+        if (window.location.protocol.startsWith('http')) {
+            try {
+                await fetch(`/api/wildlife/archive/${id}`, { method: 'POST' });
+            } catch (err) {
+                console.log("Local offline mode active.");
+            }
+        }
+
+        speciesList = speciesList.filter(s => (s.id !== id && s.speciesId !== id));
+        localRecords = speciesList;
+        renderTable();
+        showAlert(`Archived "${name}" successfully.`);
     }
 
     function filterTable() {
-        const q = document.getElementById('tableFilter').value.toLowerCase();
-        const filtered = localRecords.filter(s =>
-            s.commonName.toLowerCase().includes(q) ||
-            s.scientificName.toLowerCase().includes(q) ||
-            s.primaryPark.toLowerCase().includes(q)
-        );
+        const filterInput = document.getElementById('tableFilter');
+        const q = filterInput ? filterInput.value.toLowerCase().trim() : '';
+        if (!q) {
+            renderTable(speciesList);
+            return;
+        }
+        const filtered = speciesList.filter(s => {
+            const cName = (s.commonName || '').toLowerCase();
+            const sName = (s.scientificName || '').toLowerCase();
+            const park = (s.primaryPark || '').toLowerCase();
+            const cat = (s.category || '').toLowerCase();
+            return cName.includes(q) || sName.includes(q) || park.includes(q) || cat.includes(q);
+        });
         renderTable(filtered);
     }
 
@@ -622,51 +770,110 @@
         setTimeout(() => { alert.style.display = 'none'; }, 4000);
     }
 
-    document.getElementById('speciesForm').addEventListener('submit', async function(e) {
+    // Form Submit Listener: Handles both In-Place Update and New Registration
+    document.getElementById('speciesForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const formData = new FormData(this);
-        const searchParams = new URLSearchParams();
-        for (const pair of formData) {
-            searchParams.append(pair[0], pair[1]);
-        }
 
-        try {
-            const res = await fetch('/api/wildlife', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
-                body: searchParams
-            });
-            const json = await res.json();
-            showAlert(json.message || "Operation completed successfully!");
-            resetForm();
-            loadTableData();
-        } catch (err) {
-            // Local client-side simulation
-            const newObj = {
-                speciesId: parseInt(document.getElementById('speciesId').value) || (localRecords.length + 1),
-                commonName: document.getElementById('commonName').value,
-                scientificName: document.getElementById('scientificName').value,
-                category: document.getElementById('category').value,
-                conservationStatus: document.getElementById('conservationStatus').value,
-                primaryPark: document.getElementById('primaryPark').value,
-                dietaryHabit: document.getElementById('dietaryHabit').value,
-                habitat: document.getElementById('habitat').value,
-                bestSpottingTime: document.getElementById('bestSpottingTime').value,
-                imageUrl: document.getElementById('imageUrl').value,
-                description: document.getElementById('description').value,
+        const formData = {
+            commonName: document.getElementById('commonName').value.trim(),
+            scientificName: document.getElementById('scientificName').value.trim(),
+            category: document.getElementById('category').value,
+            conservationStatus: document.getElementById('conservationStatus').value,
+            primaryPark: document.getElementById('primaryPark').value,
+            dietaryHabit: document.getElementById('dietaryHabit').value,
+            habitat: document.getElementById('habitat').value.trim(),
+            bestSpottingTime: document.getElementById('bestSpottingTime').value.trim(),
+            imageUrl: document.getElementById('imageUrl').value.trim(),
+            description: document.getElementById('description').value.trim(),
+            status: "Active"
+        };
+
+        const targetEditingId = editingId;
+
+        if (targetEditingId !== null && targetEditingId > 0) {
+            // update logic
+            const index = speciesList.findIndex(s => s.id === targetEditingId);
+            if (index !== -1) {
+                speciesList[index] = {
+                    ...speciesList[index],
+                    ...formData,
+                    id: targetEditingId,
+                    speciesId: targetEditingId
+                };
+                localRecords = speciesList;
+
+                // Reset any active search/filter so updated record is immediately visible
+                const filterInput = document.getElementById('tableFilter');
+                if (filterInput) {
+                    filterInput.value = '';
+                }
+
+                renderTable(speciesList, targetEditingId); // அட்டவணையை மீண்டும் வரையும்
+            }
+            showAlert(`✅ "${formData.commonName}" updated successfully!`);
+        } else {
+            // Register new species: calculate unique id
+            let maxId = 0;
+            for (let i = 0; i < speciesList.length; i++) {
+                const sid = parseInt(speciesList[i].id || speciesList[i].speciesId || 0, 10);
+                if (!isNaN(sid) && sid > maxId) {
+                    maxId = sid;
+                }
+            }
+            const uniqueId = maxId > 0 ? maxId + 1 : 1;
+
+            const newSpecies = {
+                id: uniqueId,
+                speciesId: uniqueId,
+                commonName: formData.commonName,
+                scientificName: formData.scientificName,
+                category: formData.category,
+                conservationStatus: formData.conservationStatus,
+                habitat: formData.habitat || "Lowland dry and wet zone forest fringes",
+                primaryPark: formData.primaryPark,
+                dietaryHabit: formData.dietaryHabit || "Herbivore",
+                bestSpottingTime: formData.bestSpottingTime || "Early morning (06:00 - 08:30)",
+                imageUrl: formData.imageUrl || "https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=600",
+                description: formData.description || "Field catalogued wildlife specimen in Sri Lankan national parks.",
                 status: "Active"
             };
-            const existingIdx = localRecords.findIndex(x => x.speciesId === newObj.speciesId);
-            if (existingIdx >= 0) {
-                localRecords[existingIdx] = newObj;
-                showAlert("Species updated successfully (client preview mode)!");
-            } else {
-                localRecords.push(newObj);
-                showAlert("Species added successfully (client preview mode)!");
+
+            // Pushes to the master array
+            speciesList.push(newSpecies);
+            localRecords = speciesList;
+
+            // Resets any active search/filter
+            const filterInput = document.getElementById('tableFilter');
+            if (filterInput) {
+                filterInput.value = '';
             }
-            renderTable(localRecords);
-            resetForm();
+
+            // Immediately calls renderTable() properly without any JS errors
+            renderTable(speciesList, uniqueId); // அட்டவணையை மீண்டும் வரையும்
+            showAlert(`✅ New species "${newSpecies.commonName}" registered successfully!`);
         }
+
+        // If connected to Spring Boot server over HTTP/HTTPS, synchronize in background
+        if (window.location.protocol.startsWith('http')) {
+            try {
+                fetch('/api/wildlife', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(targetEditingId ? { ...formData, id: targetEditingId, speciesId: targetEditingId } : formData)
+                }).then(res => {
+                    if (res && res.ok) {
+                        console.log("Synced species with backend database.");
+                    }
+                }).catch(err => {
+                    console.warn("Backend API not reachable. Local record saved.", err);
+                });
+            } catch (err) {
+                console.warn("Offline or backend unreachable.", err);
+            }
+        }
+
+        // Reset form to default Add mode
+        resetForm();
     });
 
     document.addEventListener('DOMContentLoaded', loadTableData);
