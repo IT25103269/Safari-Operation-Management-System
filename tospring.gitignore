@@ -1,0 +1,18 @@
+# Compiled Target Output
+/target/
+*.class
+
+# IDE Configurations
+.idea/
+*.iml
+.settings/
+.project/
+.classpath/
+.SmartTomcat/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Log Files
+*.log
