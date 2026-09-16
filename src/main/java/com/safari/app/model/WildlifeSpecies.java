@@ -33,7 +33,7 @@ public class WildlifeSpecies {
     @Column(name = "DietaryHabit", length = 50)
     private String dietaryHabit; // Carnivore, Herbivore, Omnivore, Piscivore
 
-    @Column(name = "Description", columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "BestSpottingTime", length = 150)
