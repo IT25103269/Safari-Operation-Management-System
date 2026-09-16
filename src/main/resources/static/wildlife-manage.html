@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildlife Species Management - Lanka Wild Trails</title>
+    <style>
+        :root {
+            --primary-color: #2e5a27;
+            --primary-dark: #23441d;
+            --secondary-color: #8c6239;
+            --bg-light: #f4f6f3;
+            --text-dark: #2c3e50;
+            --border-color: #dcdde1;
+            --danger-color: #c0392b;
+            --warning-color: #d35400;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header a {
+            color: #e2f0d9;
+            text-decoration: none;
+            margin-left: 15px;
+            font-size: 0.95rem;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 950px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--bg-light);
+            padding-bottom: 0.6rem;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.35rem;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: #34495e;
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background-color: #2980b9;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #e9efe8;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .badge-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-archived {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+
+        .badge-endangered {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .thumbnail {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 4px;
+            background-color: #eee;
+        }
+
+        .alert-box {
+            display: none;
+            padding: 10px 14px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Lanka Wild Trails - Wildlife Management</h1>
+    <div>
+        <span style="font-size: 0.9rem; margin-right: 15px;">Role: Wildlife Officer / Admin</span>
+        <a href="wildlife-catalogue.html">Tourist View</a>
+        <a href="index.html">Main Menu</a>
+    </div>
+</header>
+
+<div class="container">
+    <div id="statusAlert" class="alert-box alert-success"></div>
+
+    <div class="grid-layout">
+        <!-- Form to Add or Edit Species -->
+        <div class="card">
+            <h2 id="formTitle">Register New Wildlife Species</h2>
+            <form id="speciesForm" action="/api/wildlife" method="POST">
+                <input type="hidden" id="speciesId" name="speciesId" value="0">
+                <input type="hidden" id="formAction" name="action" value="save">
+
+                <div class="form-group">
+                    <label for="commonName">Common Name *</label>
+                    <input type="text" id="commonName" name="commonName" placeholder="e.g. Sri Lankan Leopard" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="scientificName">Scientific Name *</label>
+                    <input type="text" id="scientificName" name="scientificName" placeholder="e.g. Panthera pardus kotiya" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="Mammal">Mammal</option>
+                            <option value="Bird">Bird</option>
+                            <option value="Reptile">Reptile</option>
+                            <option value="Amphibian">Amphibian</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="conservationStatus">IUCN Status *</label>
+                        <select id="conservationStatus" name="conservationStatus" required>
+                            <option value="Endangered">Endangered</option>
+                            <option value="Critically Endangered">Critically Endangered</option>
+                            <option value="Vulnerable">Vulnerable</option>
+                            <option value="Near Threatened">Near Threatened</option>
+                            <option value="Least Concern">Least Concern</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="primaryPark">Primary National Park *</label>
+                        <select id="primaryPark" name="primaryPark" required>
+                            <option value="Yala">Yala</option>
+                            <option value="Wilpattu">Wilpattu</option>
+                            <option value="Udawalawe">Udawalawe</option>
+                            <option value="Minneriya">Minneriya</option>
+                            <option value="Bundala">Bundala</option>
+                            <option value="Sinharaja">Sinharaja</option>
+                            <option value="Horton Plains">Horton Plains</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dietaryHabit">Dietary Habit</label>
+                        <select id="dietaryHabit" name="dietaryHabit">
+                            <option value="Carnivore">Carnivore</option>
+                            <option value="Herbivore">Herbivore</option>
+                            <option value="Omnivore">Omnivore</option>
+                            <option value="Piscivore">Piscivore</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="habitat">Natural Habitat Description</label>
+                    <input type="text" id="habitat" name="habitat" placeholder="e.g. Lowland dry zone scrub jungles">
+                </div>
+
+                <div class="form-group">
+                    <label for="bestSpottingTime">Best Spotting Time / Tips</label>
+                    <input type="text" id="bestSpottingTime" name="bestSpottingTime" placeholder="e.g. Early dawn (06:00 - 08:30)">
+                </div>
+
+                <div class="form-group">
+                    <label for="imageUrl">Photo Image URL</label>
+                    <input type="text" id="imageUrl" name="imageUrl" placeholder="https://example.com/species.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Detailed Description</label>
+                    <textarea id="description" name="description" rows="3" placeholder="Key physical traits, behavior, and field identification notes..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button type="submit" class="btn" id="submitBtn">Save Species Record</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Species Directory Table -->
+        <div class="card">
+            <h2>Registered Wildlife Species Catalogue</h2>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="tableFilter" placeholder="Search by name or park..." oninput="filterTable()" style="max-width: 300px;">
+                <button class="btn" onclick="loadTableData()">Refresh Data</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Photo</th>
+                        <th>Common Name</th>
+                        <th>Category</th>
+                        <th>Park</th>
+                        <th>IUCN Status</th>
+                        <th>Record Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="speciesTableBody">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let localRecords = [
+        {
+            speciesId: 1,
+            commonName: "Sri Lankan Leopard",
+            scientificName: "Panthera pardus kotiya",
+            category: "Mammal",
+            conservationStatus: "Endangered",
+            habitat: "Dry zone scrub forest, arid scrubland, and rocky hills",
+            primaryPark: "Yala",
+            dietaryHabit: "Carnivore",
+            bestSpottingTime: "Early morning (06:00 - 08:30)",
+            imageUrl: "https://images.unsplash.com/photo-1456926631375-92c8ce872def?w=600",
+            description: "Apex predator endemic to Sri Lanka. Yala Block 1 has one of the world's densest populations.",
+            status: "Active"
+        },
+        {
+            speciesId: 2,
+            commonName: "Asian Elephant",
+            scientificName: "Elephas maximus maximus",
+            category: "Mammal",
+            conservationStatus: "Endangered",
+            habitat: "Grasslands, scrub jungles, riverine woodlands, and reservoir banks",
+            primaryPark: "Udawalawe",
+            dietaryHabit: "Herbivore",
+            bestSpottingTime: "Late afternoon (15:00 - 18:00)",
+            imageUrl: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=600",
+            description: "Largest subspecies of Asian elephant roaming in large family herds.",
+            status: "Active"
+        },
+        {
+            speciesId: 3,
+            commonName: "Sri Lankan Sloth Bear",
+            scientificName: "Melursus ursinus inornatus",
+            category: "Mammal",
+            conservationStatus: "Vulnerable",
+            habitat: "Dense lowland dry zone forests with rock outcrops and termite hills",
+            primaryPark: "Wilpattu",
+            dietaryHabit: "Omnivore",
+            bestSpottingTime: "Early dawn (05:45 - 07:15)",
+            imageUrl: "https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=600",
+            description: "Elusive nocturnal bear specializing in termites, fruits, and honeycomb.",
+            status: "Active"
+        },
+        {
+            speciesId: 4,
+            commonName: "Mugger Crocodile",
+            scientificName: "Crocodylus palustris",
+            category: "Reptile",
+            conservationStatus: "Vulnerable",
+            habitat: "Freshwater lakes, natural villus, slow rivers, and reservoirs",
+            primaryPark: "Bundala",
+            dietaryHabit: "Carnivore",
+            bestSpottingTime: "Mid-day sun basking (10:00 - 14:00)",
+            imageUrl: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600",
+            description: "Freshwater broad-snouted crocodile sunbathing on sunny shores.",
+            status: "Active"
+        },
+        {
+            speciesId: 5,
+            commonName: "Sri Lanka Blue Magpie",
+            scientificName: "Urocissa ornata",
+            category: "Bird",
+            conservationStatus: "Vulnerable",
+            habitat: "Wet zone hill rainforest canopies",
+            primaryPark: "Sinharaja",
+            dietaryHabit: "Omnivore",
+            bestSpottingTime: "Morning canopy tours (07:00 - 10:00)",
+            imageUrl: "https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=600",
+            description: "Vivid blue endemic bird with coral-red bill and legs.",
+            status: "Active"
+        },
+        {
+            speciesId: 6,
+            commonName: "Sri Lanka Junglefowl",
+            scientificName: "Gallus lafayettii",
+            category: "Bird",
+            conservationStatus: "Least Concern",
+            habitat: "Lowland rainforests and scrub boundaries",
+            primaryPark: "Sinharaja",
+            dietaryHabit: "Omnivore",
+            bestSpottingTime: "Early morning forest margins (06:30 - 08:30)",
+            imageUrl: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=600",
+            description: "The National Bird of Sri Lanka with bright orange-red comb.",
+            status: "Active"
+        },
+        {
+            speciesId: 7,
+            commonName: "Sambar Deer",
+            scientificName: "Rusa unicolor unicolor",
+            category: "Mammal",
+            conservationStatus: "Vulnerable",
+            habitat: "Highland plateau cloud forests and montane grasslands",
+            primaryPark: "Horton Plains",
+            dietaryHabit: "Herbivore",
+            bestSpottingTime: "Early morning mist (06:00 - 08:00)",
+            imageUrl: "https://images.unsplash.com/photo-1484406566174-9da000fda645?w=600",
+            description: "Sri Lanka's largest deer species with prominent antlers.",
+            status: "Active"
+        },
+        {
+            speciesId: 8,
+            commonName: "Sri Lankan Spotted Deer",
+            scientificName: "Axis axis ceylonensis",
+            category: "Mammal",
+            conservationStatus: "Least Concern",
+            habitat: "Open savannahs and forest clearing fringes",
+            primaryPark: "Yala",
+            dietaryHabit: "Herbivore",
+            bestSpottingTime: "Dawn and dusk game drives",
+            imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600",
+            description: "Graceful spotted deer living in large herds across open grasslands.",
+            status: "Active"
+        },
+        {
+            speciesId: 9,
+            commonName: "Spot-billed Pelican",
+            scientificName: "Pelecanus philippensis",
+            category: "Bird",
+            conservationStatus: "Near Threatened",
+            habitat: "Coastal wetlands and shallow inland lakes",
+            primaryPark: "Bundala",
+            dietaryHabit: "Piscivore",
+            bestSpottingTime: "Morning feeding sessions (07:30 - 11:00)",
+            imageUrl: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=600",
+            description: "Large waterbird with a distinctive pouch and speckled beak.",
+            status: "Active"
+        },
+        {
+            speciesId: 10,
+            commonName: "Purple-faced Langur",
+            scientificName: "Semnopithecus vetulus",
+            category: "Mammal",
+            conservationStatus: "Endangered",
+            habitat: "High canopy rainforests and wet zone foliage",
+            primaryPark: "Sinharaja",
+            dietaryHabit: "Herbivore",
+            bestSpottingTime: "Active mid-morning in upper tree canopies",
+            imageUrl: "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=600",
+            description: "Endemic arboreal monkey recognized by prominent white side-whiskers.",
+            status: "Active"
+        },
+        {
+            speciesId: 11,
+            commonName: "Crested Serpent Eagle",
+            scientificName: "Spilornis cheela",
+            category: "Bird",
+            conservationStatus: "Least Concern",
+            habitat: "Forested savannas and dry woodlands",
+            primaryPark: "Yala",
+            dietaryHabit: "Carnivore",
+            bestSpottingTime: "Mid-morning thermals (09:00 - 12:00)",
+            imageUrl: "https://images.unsplash.com/photo-1611689342806-0863700ce1e4?w=600",
+            description: "Raptor perched on high dead snags scanning for reptiles.",
+            status: "Active"
+        },
+        {
+            speciesId: 12,
+            commonName: "Green Pit Viper",
+            scientificName: "Craspedocephalus trigonocephalus",
+            category: "Reptile",
+            conservationStatus: "Least Concern",
+            habitat: "Tropical wet evergreen rainforest foliage",
+            primaryPark: "Sinharaja",
+            dietaryHabit: "Carnivore",
+            bestSpottingTime: "Night walks or shaded low-hanging branches",
+            imageUrl: "https://images.unsplash.com/photo-1531386151447-fd76ad50012f?w=600",
+            description: "Endemic arboreal pit viper sporting lime green scales with black markings.",
+            status: "Active"
+        }
+    ];
+
+    async function loadTableData() {
+        try {
+            const res = await fetch('/api/wildlife');
+            if (!res.ok) throw new Error("API Offline");
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                localRecords = data;
+            }
+        } catch (e) {
+            console.log("Using local mock dataset for demonstration.");
+        }
+        renderTable(localRecords);
+    }
+
+    function renderTable(list) {
+        const tbody = document.getElementById('speciesTableBody');
+        tbody.innerHTML = list.map(s => `
+            <tr>
+                <td><img class="thumbnail" src="${s.imageUrl || 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=100'}" alt="${s.commonName}" onerror="this.src='https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=100'"></td>
+                <td><strong>${s.commonName}</strong><br><small style="color: #666; font-style: italic;">${s.scientificName}</small></td>
+                <td>${s.category}</td>
+                <td>${s.primaryPark}</td>
+                <td><span class="badge ${s.conservationStatus === 'Endangered' ? 'badge-endangered' : ''}">${s.conservationStatus}</span></td>
+                <td><span class="badge ${s.status === 'Active' ? 'badge-active' : 'badge-archived'}">${s.status || 'Active'}</span></td>
+                <td class="action-btns">
+                    <button type="button" class="btn-edit" onclick="populateEdit(${s.speciesId})">Edit</button>
+                    <button type="button" class="btn-danger" onclick="archiveSpecies(${s.speciesId})">Archive</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function populateEdit(id) {
+        const item = localRecords.find(x => x.speciesId === id);
+        if (!item) return;
+
+        document.getElementById('speciesId').value = item.speciesId;
+        document.getElementById('commonName').value = item.commonName;
+        document.getElementById('scientificName').value = item.scientificName;
+        document.getElementById('category').value = item.category;
+        document.getElementById('conservationStatus').value = item.conservationStatus;
+        document.getElementById('primaryPark').value = item.primaryPark;
+        document.getElementById('dietaryHabit').value = item.dietaryHabit || 'Carnivore';
+        document.getElementById('habitat').value = item.habitat || '';
+        document.getElementById('bestSpottingTime').value = item.bestSpottingTime || '';
+        document.getElementById('imageUrl').value = item.imageUrl || '';
+        document.getElementById('description').value = item.description || '';
+
+        document.getElementById('formTitle').innerText = `Edit: ${item.commonName}`;
+        document.getElementById('submitBtn').innerText = "Update Species";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+        document.getElementById('speciesForm').reset();
+        document.getElementById('speciesId').value = "0";
+        document.getElementById('formTitle').innerText = "Register New Wildlife Species";
+        document.getElementById('submitBtn').innerText = "Save Species Record";
+    }
+
+    async function archiveSpecies(id) {
+        if (!confirm("Are you sure you want to archive this species record?")) return;
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append('action', 'archive');
+            formData.append('speciesId', id);
+
+            const res = await fetch('/api/wildlife', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            if (res.ok) {
+                showAlert("Species archived successfully.");
+            }
+        } catch (err) {
+            showAlert("Species archived (offline mode).");
+        }
+
+        localRecords = localRecords.filter(s => s.speciesId !== id);
+        renderTable(localRecords);
+    }
+
+    function filterTable() {
+        const q = document.getElementById('tableFilter').value.toLowerCase();
+        const filtered = localRecords.filter(s =>
+            s.commonName.toLowerCase().includes(q) ||
+            s.scientificName.toLowerCase().includes(q) ||
+            s.primaryPark.toLowerCase().includes(q)
+        );
+        renderTable(filtered);
+    }
+
+    function showAlert(msg) {
+        const alert = document.getElementById('statusAlert');
+        alert.innerText = msg;
+        alert.style.display = 'block';
+        setTimeout(() => { alert.style.display = 'none'; }, 4000);
+    }
+
+    document.getElementById('speciesForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const searchParams = new URLSearchParams();
+        for (const pair of formData) {
+            searchParams.append(pair[0], pair[1]);
+        }
+
+        try {
+            const res = await fetch('/api/wildlife', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+                body: searchParams
+            });
+            const json = await res.json();
+            showAlert(json.message || "Operation completed successfully!");
+            resetForm();
+            loadTableData();
+        } catch (err) {
+            // Local client-side simulation
+            const newObj = {
+                speciesId: parseInt(document.getElementById('speciesId').value) || (localRecords.length + 1),
+                commonName: document.getElementById('commonName').value,
+                scientificName: document.getElementById('scientificName').value,
+                category: document.getElementById('category').value,
+                conservationStatus: document.getElementById('conservationStatus').value,
+                primaryPark: document.getElementById('primaryPark').value,
+                dietaryHabit: document.getElementById('dietaryHabit').value,
+                habitat: document.getElementById('habitat').value,
+                bestSpottingTime: document.getElementById('bestSpottingTime').value,
+                imageUrl: document.getElementById('imageUrl').value,
+                description: document.getElementById('description').value,
+                status: "Active"
+            };
+            const existingIdx = localRecords.findIndex(x => x.speciesId === newObj.speciesId);
+            if (existingIdx >= 0) {
+                localRecords[existingIdx] = newObj;
+                showAlert("Species updated successfully (client preview mode)!");
+            } else {
+                localRecords.push(newObj);
+                showAlert("Species added successfully (client preview mode)!");
+            }
+            renderTable(localRecords);
+            resetForm();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadTableData);
+</script>
+
+</body>
+</html>
