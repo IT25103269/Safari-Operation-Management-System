@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Lankan Wildlife Guide - Lanka Wild Trails</title>
+    <style>
+        :root {
+            --primary-color: #2e5a27;
+            --primary-dark: #23441d;
+            --accent-color: #d35400;
+            --bg-light: #f8f9fa;
+            --text-dark: #2c3e50;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header a {
+            color: #d8f3dc;
+            text-decoration: none;
+            margin-left: 15px;
+            font-size: 0.95rem;
+        }
+        header a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), #2e5a27;
+            color: white;
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: 2.4rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        input, select {
+            padding: 0.65rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .btn-search {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-search:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-reset {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 0.75rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background-color: #e2e8f0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0 0 4px 0;
+        }
+
+        .scientific-name {
+            font-style: italic;
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .tag-group {
+            margin-bottom: 14px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #eef5ed;
+            color: var(--primary-color);
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .tag-endangered {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .tag-vulnerable {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .tag-park {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .description {
+            font-size: 0.92rem;
+            color: #4a5568;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            flex-grow: 1;
+        }
+
+        .spotting-info {
+            background: #f8fafc;
+            border-left: 3px solid var(--primary-color);
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            color: #334155;
+            border-radius: 0 4px 4px 0;
+            margin-bottom: 14px;
+        }
+
+        .card-footer {
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-log {
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .btn-log:hover {
+            background-color: #b34300;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>Lanka Wild Trails</h2>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="tourist-packages.html">Safari Packages</a>
+        <a href="approved-sightings.html">Sightings Gallery</a>
+        <a href="wildlife-catalogue.html" style="font-weight: bold; color: white;">Wildlife Guide</a>
+        <a href="wildlife-manage.html">Staff Portal</a>
+    </nav>
+</header>
+
+<div class="hero">
+    <h1>Wildlife Identification & Field Guide</h1>
+    <p>Explore Sri Lanka's endemic and iconic species, their habitats, and best spotting times.</p>
+</div>
+
+<div class="container">
+    <div class="filter-section">
+        <div class="filter-grid">
+            <div class="form-group">
+                <label for="parkFilter">National Park</label>
+                <select id="parkFilter">
+                    <option value="">All National Parks</option>
+                    <option value="Yala">Yala National Park</option>
+                    <option value="Wilpattu">Wilpattu National Park</option>
+                    <option value="Udawalawe">Udawalawe National Park</option>
+                    <option value="Minneriya">Minneriya National Park</option>
+                    <option value="Bundala">Bundala National Park</option>
+                    <option value="Sinharaja">Sinharaja Forest Reserve</option>
+                    <option value="Horton Plains">Horton Plains</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="categoryFilter">Category</label>
+                <select id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="Mammal">Mammals</option>
+                    <option value="Bird">Birds</option>
+                    <option value="Reptile">Reptiles</option>
+                    <option value="Amphibian">Amphibians</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="searchQuery">Search Name</label>
+                <input type="text" id="searchQuery" placeholder="e.g. Leopard, Elephant, Bear...">
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-search" style="flex: 1;" onclick="fetchSpecies()">Filter</button>
+                <button class="btn-reset" onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Species Grid -->
+    <div class="cards-grid" id="speciesGrid">
+        <!-- Rendered by JavaScript -->
+    </div>
+</div>
+
+<script>
+    // Initial Seed Data aligned with database/schema.sql
+    const fallbackSpecies = [
+        {
+            speciesId: 1,
+            commonName: "Sri Lankan Leopard",
+            scientificName: "Panthera pardus kotiya",
+            category: "Mammal",
+            conservationStatus: "Endangered",
+            habitat: "Dry zone scrub forest, arid scrubland, and rocky hills",
+            primaryPark: "Yala",
+            dietaryHabit: "Carnivore",
+            description: "Endemic apex predator of Sri Lanka. Yala National Park (Block 1) possesses one of the densest wild leopard populations in the world.",
+            bestSpottingTime: "Early morning (06:00 - 08:30) and late afternoon around waterholes",
+            imageUrl: "https://images.unsplash.com/photo-1456926631375-92c8ce872def?w=600"
+        },
+        {
+            speciesId: 2,
+            commonName: "Asian Elephant",
+            scientificName: "Elephas maximus maximus",
+            category: "Mammal",
+            conservationStatus: "Endangered",
+            habitat: "Grasslands, scrub jungles, riverine woodlands, and reservoir banks",
+            primaryPark: "Udawalawe",
+            dietaryHabit: "Herbivore",
+            description: "The Sri Lankan elephant is the largest and darkest subspecies of the Asian elephant. Udawalawe and Minneriya offer world-renowned gathering sightings.",
+            bestSpottingTime: "Late afternoon (15:00 - 18:00) during reservoir baths",
+            imageUrl: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=600"
+        },
+        {
+            speciesId: 3,
+            commonName: "Sri Lankan Sloth Bear",
+            scientificName: "Melursus ursinus inornatus",
+            category: "Mammal",
+            conservationStatus: "Vulnerable",
+            habitat: "Dense lowland dry zone forests with rock outcrops and termite hills",
+            primaryPark: "Wilpattu",
+            dietaryHabit: "Omnivore",
+            description: "Highly elusive and solitary bear subspecies with a shaggy coat. Feeds heavily on termites, honeycomb, and sweet Palu and Weera tree berries.",
+            bestSpottingTime: "Early dawn (05:45 - 07:15) during dry season fruiting",
+            imageUrl: "https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=600"
+        },
+        {
+            speciesId: 4,
+            commonName: "Mugger Crocodile",
+            scientificName: "Crocodylus palustris",
+            category: "Reptile",
+            conservationStatus: "Vulnerable",
+            habitat: "Freshwater lakes, natural villus, slow rivers, and reservoirs",
+            primaryPark: "Bundala",
+            dietaryHabit: "Carnivore",
+            description: "Freshwater broad-snouted crocodile often seen sunbathing motionless along the sunny banks of villus in lowland dry zones.",
+            bestSpottingTime: "Mid-day sun basking (10:00 - 14:00)",
+            imageUrl: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600"
+        },
+        {
+            speciesId: 5,
+            commonName: "Sri Lanka Blue Magpie",
+            scientificName: "Urocissa ornata",
+            category: "Bird",
+            conservationStatus: "Vulnerable",
+            habitat: "Wet zone hill rainforest canopies and dense foothill jungles",
+            primaryPark: "Sinharaja",
+            dietaryHabit: "Omnivore",
+            description: "Vibrant endemic bird with a fiery coral-red bill and legs, deep chestnut head and wings, and bright cobalt blue plumage. Moves in lively family flocks.",
+            bestSpottingTime: "Morning canopy feeding tours (07:00 - 10:00)",
+            imageUrl: "https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=600"
+        },
+        {
+            speciesId: 6,
+            commonName: "Sri Lanka Junglefowl",
+            scientificName: "Gallus lafayettii",
+            category: "Bird",
+            conservationStatus: "Least Concern",
+            habitat: "Lowland rainforests, dry forest floor, and scrub boundaries",
+            primaryPark: "Sinharaja",
+            dietaryHabit: "Omnivore",
+            description: "The National Bird of Sri Lanka. Endemic galliform known for the male's vivid orange-red comb with a yellow centre and iridescent body plumage.",
+            bestSpottingTime: "Early morning forest margins (06:30 - 08:30)",
+            imageUrl: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=600"
+        },
+        {
+            speciesId: 7,
+            commonName: "Sambar Deer",
+            scientificName: "Rusa unicolor unicolor",
+            category: "Mammal",
+            conservationStatus: "Vulnerable",
+            habitat: "Highland plateau cloud forests, montane grasslands, and dry forest fringes",
+            primaryPark: "Horton Plains",
+            dietaryHabit: "Herbivore",
+            description: "Sri Lanka's largest deer species. Large stags carry prominent three-tined antlers and browse across misty highland plains.",
+            bestSpottingTime: "Early morning mist (06:00 - 08:00) and twilight",
+            imageUrl: "https://images.unsplash.com/photo-1484406566174-9da000fda645?w=600"
+        },
+        {
+            speciesId: 8,
+            commonName: "Sri Lankan Spotted Deer",
+            scientificName: "Axis axis ceylonensis",
+            category: "Mammal",
+            conservationStatus: "Least Concern",
+            habitat: "Open savannahs, forest clearing fringes, and waterhole banks",
+            primaryPark: "Yala",
+            dietaryHabit: "Herbivore",
+            description: "Graceful herbivore living in large herds. Recognized by its reddish-fawn coat dotted with white spots; vital prey species for leopards.",
+            bestSpottingTime: "Throughout safari game drives, especially dawn and dusk",
+            imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600"
+        },
+        {
+            speciesId: 9,
+            commonName: "Spot-billed Pelican",
+            scientificName: "Pelecanus philippensis",
+            category: "Bird",
+            conservationStatus: "Near Threatened",
+            habitat: "Coastal wetlands, saline lagoons, and shallow inland lakes",
+            primaryPark: "Bundala",
+            dietaryHabit: "Piscivore",
+            description: "Large waterbird with a distinctive pouch and speckled beak. Breeds in colonies near coastal lagoons in Bundala, a RAMSAR wetland.",
+            bestSpottingTime: "Morning feeding sessions (07:30 - 11:00)",
+            imageUrl: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=600"
+        },
+        {
+            speciesId: 10,
+            commonName: "Purple-faced Langur",
+            scientificName: "Semnopithecus vetulus",
+            category: "Mammal",
+            conservationStatus: "Endangered",
+            habitat: "High canopy rainforests, wet zone foliage, and riverine forests",
+            primaryPark: "Sinharaja",
+            dietaryHabit: "Herbivore",
+            description: "Endemic arboreal leaf-monkey recognized by its dark body, prominent white side-whiskers, and characteristic territorial loud calls.",
+            bestSpottingTime: "Active throughout mid-morning in upper tree canopy",
+            imageUrl: "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=600"
+        },
+        {
+            speciesId: 11,
+            commonName: "Crested Serpent Eagle",
+            scientificName: "Spilornis cheela",
+            category: "Bird",
+            conservationStatus: "Least Concern",
+            habitat: "Forested savannas, dry woodlands, and wetland edges",
+            primaryPark: "Yala",
+            dietaryHabit: "Carnivore",
+            description: "Powerful raptor with a bare yellow face and crest. Often spotted perched upright on high dead snags scanning for reptiles and frogs.",
+            bestSpottingTime: "Mid-morning thermals (09:00 - 12:00)",
+            imageUrl: "https://images.unsplash.com/photo-1611689342806-0863700ce1e4?w=600"
+        },
+        {
+            speciesId: 12,
+            commonName: "Green Pit Viper",
+            scientificName: "Craspedocephalus trigonocephalus",
+            category: "Reptile",
+            conservationStatus: "Least Concern",
+            habitat: "Tropical wet evergreen rainforest foliage, tea plantations, and low bushes",
+            primaryPark: "Sinharaja",
+            dietaryHabit: "Carnivore",
+            description: "Endemic arboreal pit viper sporting striking lime green scales with black markings and a prehensile tail for grip.",
+            bestSpottingTime: "Night walks or shaded low-hanging branches in damp forests",
+            imageUrl: "https://images.unsplash.com/photo-1531386151447-fd76ad50012f?w=600"
+        }
+    ];
+
+    async function fetchSpecies() {
+        const park = document.getElementById('parkFilter').value;
+        const category = document.getElementById('categoryFilter').value;
+        const query = document.getElementById('searchQuery').value.trim();
+
+        try {
+            const url = `/api/wildlife?park=${encodeURIComponent(park)}&category=${encodeURIComponent(category)}&query=${encodeURIComponent(query)}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("API Offline");
+            const data = await res.json();
+            renderCards(data.length > 0 ? data : []);
+        } catch (err) {
+            // Filter local fallback when API is not yet running
+            let filtered = fallbackSpecies.filter(s => {
+                const matchPark = !park || s.primaryPark.toLowerCase() === park.toLowerCase();
+                const matchCat = !category || s.category.toLowerCase() === category.toLowerCase();
+                const matchQuery = !query || s.commonName.toLowerCase().includes(query.toLowerCase()) || s.scientificName.toLowerCase().includes(query.toLowerCase());
+                return matchPark && matchCat && matchQuery;
+            });
+            renderCards(filtered);
+        }
+    }
+
+    function renderCards(speciesList) {
+        const grid = document.getElementById('speciesGrid');
+        if (!speciesList || speciesList.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; background: white; border-radius: 8px;">
+                <h3>No wildlife species found matching your criteria.</h3>
+                <p style="color: #666;">Try adjusting your park, category, or search keywords.</p>
+            </div>`;
+            return;
+        }
+
+        grid.innerHTML = speciesList.map(s => {
+            const statusClass = s.conservationStatus === 'Endangered' ? 'tag-endangered' : (s.conservationStatus === 'Vulnerable' ? 'tag-vulnerable' : '');
+            return `
+            <div class="card">
+                <img class="card-img" src="${s.imageUrl || 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=600'}" alt="${s.commonName}" onerror="this.src='https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=600'">
+                <div class="card-body">
+                    <h3 class="card-title">${s.commonName}</h3>
+                    <div class="scientific-name">${s.scientificName}</div>
+                    <div class="tag-group">
+                        <span class="tag">${s.category}</span>
+                        <span class="tag ${statusClass}">${s.conservationStatus}</span>
+                        <span class="tag tag-park">${s.primaryPark}</span>
+                        <span class="tag">${s.dietaryHabit || 'Wild'}</span>
+                    </div>
+                    <p class="description">${s.description}</p>
+                    <div class="spotting-info">
+                        <strong>Best Spotting:</strong> ${s.bestSpottingTime || 'Anytime during park open hours'}
+                    </div>
+                    <div class="card-footer">
+                        <small style="color: #64748b;">Habitat: ${s.habitat || 'Protected wilderness'}</small>
+                        <a class="btn-log" href="log-sighting.html?animal=${encodeURIComponent(s.commonName)}&park=${encodeURIComponent(s.primaryPark)}">Log Sighting</a>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+    }
+
+    function resetFilters() {
+        document.getElementById('parkFilter').value = '';
+        document.getElementById('categoryFilter').value = '';
+        document.getElementById('searchQuery').value = '';
+        fetchSpecies();
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchSpecies);
+</script>
+
+</body>
+</html>
