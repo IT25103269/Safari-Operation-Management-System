@@ -18,6 +18,7 @@
         .card-btn { background-color: #2980b9; color: white; text-decoration: none; padding: 8px 12px; border-radius: 4px; font-size: 0.85em; text-align: center; font-weight: bold; }
         .card-btn:hover { background-color: #1c5980; }
         .alert-card { border-top-color: #e67e22; }
+        .approval-card { border-top-color: #27ae60; }
     </style>
 </head>
 <body>
@@ -25,8 +26,8 @@
 <div class="header-nav">
     <h1>Lanka Wild Trails — Admin Console</h1>
     <div>
-        User: <strong>Nimal Perera (Operations Manager)</strong> |
-        <a href="login.html" class="logout-btn">Logout</a>
+        User: <strong id="adminUserName">Admin User</strong> |
+        <a href="#" onclick="logout()" class="logout-btn">Logout</a>
     </div>
 </div>
 
@@ -55,7 +56,7 @@
                 <div class="card-title">🚘 Fleet & Vehicle Status</div>
                 <div class="card-desc">Monitor vehicle availability, register new fleet items, and review driver maintenance logs.</div>
             </div>
-            <a href="manage-vehicles.html" class="card-btn">Manage Fleet</a>
+            <a href="vehicles-list.html" class="card-btn">Manage Fleet</a>
         </div>
 
         <div class="card">
@@ -66,23 +67,54 @@
             <a href="manage-allocations.html" class="card-btn">View Allocations</a>
         </div>
 
-        <a href="manage-cottages.html" class="card" style="text-decoration:none;">
+        <div class="card">
             <div>
                 <div class="card-title">🏡 Cottage Reservations</div>
                 <div class="card-desc">Monitor park accommodation availability, approve stays, and manage tourist check-ins/check-outs.</div>
             </div>
-            <span class="card-btn">Manage Cottages</span>
-        </a>
+            <a href="manage-cottages.html" class="card-btn">Manage Cottages</a>
+        </div>
 
         <div class="card">
             <div>
-                <div class="card-title">🦁 Wildlife Records & Info</div>
-                <div class="card-desc">Review submitted sighting reports from guides and update species databases managed by Tharushi.</div>
+                <div class="card-title">🦁 Verified Wildlife Gallery</div>
+                <div class="card-desc">Explore approved sighting records, public species entries, and historical national park wildlife logs.</div>
             </div>
-            <a href="approved-sightings.html" class="card-btn">View Wildlife Data</a>
+            <a href="wildlife-manage.html" class="card-btn">View Wildlife Data</a>
+        </div>
+
+
+        <div class="card approval-card">
+            <div>
+                <div class="card-title">📋 Moderate Sighting Logs</div>
+                <div class="card-desc">Review incoming wildlife sightings submitted by field drivers and guides. Approve entries or reject invalid reports.</div>
+            </div>
+            <a href="view-sightings-review.html" class="card-btn" style="background-color: #27ae60;">Review Pending Sightings</a>
         </div>
     </div>
 </div>
 
+<script>
+    async function initAdminDashboard() {
+        try {
+            const res = await fetch('/api/user/profile');
+            if (res.status === 401) {
+                window.location.href = '/login.html';
+                return;
+            }
+            const user = await res.json();
+            document.getElementById('adminUserName').innerText = user.fullName + " (" + user.role + ")";
+        } catch (err) {
+            console.error("Session check failed", err);
+        }
+    }
+
+    async function logout() {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/login.html';
+    }
+
+    initAdminDashboard();
+</script>
 </body>
 </html>
