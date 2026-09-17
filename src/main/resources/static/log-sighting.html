@@ -5,46 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log Wildlife Sighting - Lanka Wild Trails</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-        .container { max-width: 600px; background: white; padding: 20px; margin: auto; border-radius: 5px; }
-        h2 { color: #2c3e50; }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; color: #2c3e50; }
+        .container { max-width: 650px; background: white; padding: 25px; margin: auto; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        h2 { margin: 0; color: #1b382b; }
+        .back-link { color: #2e5a44; text-decoration: none; font-weight: bold; font-size: 0.9em; }
         .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input[type="text"], input[type="date"], input[type="time"], select, textarea, input[type="file"] {
-            width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
+        input[type="text"], input[type="date"], input[type="time"], select, textarea {
+            width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95em;
         }
-        button { background-color: #27ae60; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { background-color: #27ae60; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; }
         button:hover { background-color: #219150; }
+        .alert { padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        .alert-error { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Log Wildlife Sighting</h2>
-    <form action="/submit-sighting" method="POST" enctype="multipart/form-data">
+    <div class="header-top">
+        <h2>Log Wildlife Sighting</h2>
+        <a href="guide-dashboard.html" class="back-link">&larr; Guide Portal</a>
+    </div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <form action="/submit-sighting" method="POST">
 
         <div class="form-group">
-            <label for="tripId">Trip ID / Booking Ref:</label>
-            <input type="text" id="tripId" name="tripId" placeholder="TRP-1024" required>
+            <label for="tripId">Trip ID / Booking Ref *</label>
+            <input type="text" id="tripId" name="tripId" placeholder="e.g. LWT-2026-1024" required>
         </div>
 
         <div class="form-group">
-            <label for="animalName">Animal / Species Name:</label>
-            <input type="text" id="animalName" name="animalName" placeholder="Sri Lankan Leopard" required>
+            <label for="animalName">Animal / Species Name *</label>
+            <input type="text" id="animalName" name="animalName" placeholder="e.g. Sri Lankan Leopard, Asian Elephant" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="sightingDate">Date *</label>
+                <input type="date" id="sightingDate" name="sightingDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="sightingTime">Time *</label>
+                <input type="time" id="sightingTime" name="sightingTime" required>
+            </div>
         </div>
 
         <div class="form-group">
-            <label for="sightingDate">Date:</label>
-            <input type="date" id="sightingDate" name="sightingDate" required>
-        </div>
-
-        <div class="form-group">
-            <label for="sightingTime">Time:</label>
-            <input type="time" id="sightingTime" name="sightingTime" required>
-        </div>
-
-        <div class="form-group">
-            <label for="park">National Park:</label>
+            <label for="park">National Park *</label>
             <select id="park" name="park" required>
                 <option value="">-- Select Park --</option>
                 <option value="Yala">Yala National Park</option>
@@ -52,27 +65,45 @@
                 <option value="Udawalawe">Udawalawe National Park</option>
                 <option value="Minneriya">Minneriya National Park</option>
                 <option value="Bundala">Bundala National Park</option>
+                <option value="Sinharaja">Sinharaja Forest Reserve</option>
+                <option value="Horton Plains">Horton Plains</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="location">Location / GPS / Landmark:</label>
-            <input type="text" id="location" name="location" placeholder="Near the Lake..." required>
+            <label for="location">Location / Landmark *</label>
+            <input type="text" id="location" name="location" placeholder="e.g. Near Kotabandu waterhole, Block 1" required>
         </div>
 
         <div class="form-group">
-            <label for="photo">Upload Photo:</label>
-            <input type="file" id="photo" name="photo" accept="image/*">
+            <label for="notes">Additional Field Notes / Animal Count</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="Resting under rock ledge, solitary adult male, healthy condition..."></textarea>
         </div>
 
-        <div class="form-group">
-            <label for="notes">Additional Notes:</label>
-            <textarea id="notes" name="notes" rows="3" ></textarea>
-        </div>
-
-        <button type="submit">Submit Sighting Record</button>
+        <button type="submit">Submit Sighting for Verification</button>
     </form>
 </div>
+
+<script>
+    // Autofill date & time
+    const today = new Date();
+    document.getElementById('sightingDate').value = today.toISOString().split('T')[0];
+    const hours = String(today.getHours()).padStart(2, '0');
+    const mins = String(today.getMinutes()).padStart(2, '0');
+    document.getElementById('sightingTime').value = `${hours}:${mins}`;
+
+    // Autofill query params if linked from species catalogue or trip view
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('animal')) document.getElementById('animalName').value = params.get('animal');
+    if (params.get('park')) document.getElementById('park').value = params.get('park');
+    if (params.get('tripId')) document.getElementById('tripId').value = params.get('tripId');
+    if (params.get('error')) {
+        const box = document.getElementById('alertBox');
+        box.className = 'alert alert-error';
+        box.innerText = "Error: " + decodeURIComponent(params.get('error'));
+        box.style.display = 'block';
+    }
+</script>
 
 </body>
 </html>

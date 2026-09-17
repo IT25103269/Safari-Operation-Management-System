@@ -3,114 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Approved Wildlife Sightings - Lanka Wild Trails</title>
+    <title>Verified Wildlife Sightings - Lanka Wild Trails</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-        .container { max-width: 1000px; margin: auto; }
-        h2 { color: #2c3e50; text-align: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; color: #333; padding-bottom: 50px; }
+        .navbar {
+            background-color: #1e3d2f;
+            color: white;
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        .navbar h1 { font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+        .nav-links a {
+            color: #d1fae5;
+            text-decoration: none;
+            margin-left: 18px;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: #ffffff; text-decoration: underline; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header-section h2 { color: #1e3d2f; font-size: 2rem; margin-bottom: 8px; }
+        .header-section p { color: #64748b; font-size: 1rem; }
+        
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 25px;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 8px 14px;
+            flex: 1;
+            min-width: 250px;
+        }
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            margin-left: 8px;
+            font-size: 0.95rem;
+        }
+        .filter-group select {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            outline: none;
+            background: white;
+            font-size: 0.95rem;
+        }
 
         .cards-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
         }
 
         .card {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 280px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
         }
 
-        .card img {
+        .badge-verified {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #059669;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .card-img {
             width: 100%;
-            height: 180px;
+            height: 200px;
             object-fit: cover;
-            background-color: #ddd;
+            background-color: #e2e8f0;
         }
 
         .card-body {
-            padding: 15px;
+            padding: 20px;
             flex-grow: 1;
         }
 
         .card-title {
-            font-size: 1.2em;
+            font-size: 1.3rem;
             font-weight: bold;
-            color: #2c3e50;
-            margin: 0 0 8px 0;
+            color: #1e293b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .meta-info {
-            font-size: 0.9em;
-            color: #555;
-            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #475569;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .meta-info i { width: 16px; color: #1e3d2f; }
+
+        .notes-box {
+            background: #f8fafc;
+            border-left: 3px solid #10b981;
+            padding: 10px;
+            margin-top: 12px;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            color: #334155;
+            font-style: italic;
         }
 
         .card-footer {
-            background-color: #fafafa;
-            padding: 10px 15px;
-            border-top: 1px solid #eee;
-            font-size: 0.8em;
-            color: #777;
+            background-color: #f8fafc;
+            padding: 12px 20px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.82rem;
+            color: #64748b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 12px;
+            grid-column: 1 / -1;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .empty-state i { font-size: 3rem; color: #94a3b8; margin-bottom: 15px; }
+        .empty-state h3 { color: #334155; margin-bottom: 8px; }
+        .empty-state p { color: #64748b; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Verified Wildlife Sightings Gallery</h2>
-
-    <div class="cards-grid">
-
-
-        <div class="card">
-            <img src="" alt="Sri Lankan Leopard">
-            <div class="card-body">
-                <div class="card-title">Sri Lankan Leopard</div>
-                <div class="meta-info"><strong>Park:</strong> Yala National Park (Block 1)</div>
-                <div class="meta-info"><strong>Date:</strong> Aug 22, 2026 at 07:45 AM</div>
-                <div class="meta-info"><strong>Notes:</strong> Resting near the main waterhole area.</div>
-            </div>
-            <div class="card-footer">
-                Logged by:
-            </div>
-        </div>
-
-
-        <div class="card">
-            <img src="" alt="Asian Elephant">
-            <div class="card-body">
-                <div class="card-title">Asian Elephant Herd</div>
-                <div class="meta-info"><strong>Park:</strong> Udawalawe National Park</div>
-                <div class="meta-info"><strong>Date:</strong> Aug 21, 2026 at 04:15 PM</div>
-                <div class="meta-info"><strong>Notes:</strong> Group of 6 elephants near the reservoir bank.</div>
-            </div>
-            <div class="card-footer">
-                Logged by:
-            </div>
-        </div>
-
-        <div class="card">
-            <img src="" alt="Sloth Bear">
-            <div class="card-body">
-                <div class="card-title">Bear</div>
-                <div class="meta-info"><strong>Park:</strong> Wilpattu National Park</div>
-                <div class="meta-info"><strong>Date:</strong> Aug 20, 2026 at 06:30 AM</div>
-                <div class="meta-info"><strong>Notes:</strong> Crossings near Palu forest trail.</div>
-            </div>
-            <div class="card-footer">
-                Logged by:
-            </div>
-        </div>
-
+<div class="navbar">
+    <h1><i class="fa-solid fa-binoculars"></i> Lanka Wild Trails</h1>
+    <div class="nav-links">
+        <a href="tourist-dashboard.html"><i class="fa-solid fa-home"></i> Home</a>
+        <a href="tourist-packages.html"><i class="fa-solid fa-compass"></i> Safari Packages</a>
+        <a href="log-sighting.html"><i class="fa-solid fa-camera"></i> Log Sighting</a>
+        <a href="cottage.html"><i class="fa-solid fa-hotel"></i> Cottages</a>
     </div>
 </div>
+
+<div class="container">
+    <div class="header-section">
+        <h2>Verified Wildlife Sightings</h2>
+        <p>Live wildlife encounters confirmed and authenticated by our Park Rangers & Wildlife Officers.</p>
+    </div>
+
+    <div class="filter-bar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Search by species, park, or notes..." onkeyup="filterSightings()">
+        </div>
+        <div class="filter-group">
+            <select id="parkFilter" onchange="filterSightings()">
+                <option value="">All National Parks</option>
+                <option value="Yala">Yala National Park</option>
+                <option value="Wilpattu">Wilpattu National Park</option>
+                <option value="Udawalawe">Udawalawe National Park</option>
+                <option value="Minneriya">Minneriya National Park</option>
+                <option value="Sinharaja">Sinharaja Forest Reserve</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="cards-grid" id="sightingsGrid">
+        <div class="empty-state">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <h3>Loading verified sightings...</h3>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allSightings = [];
+
+    const defaultImages = {
+        'leopard': 'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=600&q=80',
+        'elephant': 'https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=600&q=80',
+        'bear': 'https://images.unsplash.com/photo-1589656966895-2f33e7653819?auto=format&fit=crop&w=600&q=80',
+        'crocodile': 'https://images.unsplash.com/photo-1527525443983-6e60c75fff46?auto=format&fit=crop&w=600&q=80',
+        'deer': 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=600&q=80',
+        'peacock': 'https://images.unsplash.com/photo-1536514498073-50e69d1aef34?auto=format&fit=crop&w=600&q=80',
+        'default': 'https://images.unsplash.com/photo-1534177616072-ef7dc120449d?auto=format&fit=crop&w=600&q=80'
+    };
+
+    function getImageForSpecies(speciesName, imageUrl) {
+        if (imageUrl && imageUrl.trim() !== '') {
+            return imageUrl;
+        }
+        if (!speciesName) return defaultImages.default;
+        const name = speciesName.toLowerCase();
+        for (const [key, url] of Object.entries(defaultImages)) {
+            if (name.includes(key)) return url;
+        }
+        return defaultImages.default;
+    }
+
+    async function loadVerifiedSightings() {
+        try {
+            const res = await fetch('/api/sightings?status=Verified');
+            if (!res.ok) throw new Error('Failed to load verified sightings');
+            allSightings = await res.json();
+            renderSightings(allSightings);
+        } catch (err) {
+            console.error('Error fetching sightings:', err);
+            document.getElementById('sightingsGrid').innerHTML = `
+                <div class="empty-state">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #e11d48;"></i>
+                    <h3>Unable to load sightings</h3>
+                    <p>${err.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    function renderSightings(sightings) {
+        const grid = document.getElementById('sightingsGrid');
+        if (!sightings || sightings.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fa-solid fa-paw"></i>
+                    <h3>No Verified Sightings Found</h3>
+                    <p>Verified sightings confirmed by wildlife officers will appear here.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = sightings.map(s => {
+            const imgSrc = getImageForSpecies(s.speciesName, s.photoUrl || s.imageUrl);
+            const dateStr = s.sightingDate || 'Recent';
+            const timeStr = s.sightingTime || '';
+            const locationStr = s.parkLocation ? (s.parkLocation + (s.specificLocation ? ' - ' + s.specificLocation : '')) : (s.location || 'Sri Lanka Protected Area');
+            const notes = s.notes || 'Natural behavior observed in protected habitat.';
+            const loggedBy = s.loggedBy || 'Safari Guide';
+            const verifiedBy = 'Official Ranger Verification';
+
+            return `
+                <div class="card">
+                    <div class="badge-verified"><i class="fa-solid fa-circle-check"></i> Verified</div>
+                    <img class="card-img" src="${imgSrc}" alt="${s.speciesName}" onerror="this.src='${defaultImages.default}'">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <span>${s.speciesName}</span>
+                        </div>
+                        <div class="meta-info">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <strong>Park:</strong> ${locationStr}
+                        </div>
+                        <div class="meta-info">
+                            <i class="fa-regular fa-clock"></i>
+                            <strong>Date/Time:</strong> ${dateStr} ${timeStr ? 'at ' + timeStr : ''}
+                        </div>
+                        <div class="notes-box">
+                            "${notes}"
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span><i class="fa-solid fa-user-pen"></i> Logged by: <strong>${loggedBy}</strong></span>
+                        <span title="${verifiedBy}"><i class="fa-solid fa-shield-halved" style="color: #059669;"></i> Officer Confirmed</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function filterSightings() {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        const park = document.getElementById('parkFilter').value.toLowerCase().trim();
+
+        const filtered = allSightings.filter(s => {
+            const locText = ((s.parkLocation || '') + ' ' + (s.specificLocation || '') + ' ' + (s.location || '')).toLowerCase();
+            const matchesQuery = !query || 
+                (s.speciesName && s.speciesName.toLowerCase().includes(query)) ||
+                locText.includes(query) ||
+                (s.notes && s.notes.toLowerCase().includes(query));
+
+            const matchesPark = !park || locText.includes(park);
+
+            return matchesQuery && matchesPark;
+        });
+
+        renderSightings(filtered);
+    }
+
+    window.addEventListener('DOMContentLoaded', loadVerifiedSightings);
+</script>
 
 </body>
 </html>

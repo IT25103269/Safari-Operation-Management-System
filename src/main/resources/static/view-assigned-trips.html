@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Safari Trips - Lanka Wild Trails</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f4f7f2; color: #1f2933; }
+        main { padding: 30px; }
+        section { max-width: 1100px; margin: auto; padding: 28px; background: white; border: 1px solid #d9e2d0; border-radius: 8px; }
+        .eyebrow { color: #1e3d59; font-weight: bold; text-transform: uppercase; font-size: 0.85em; }
+        h1 { margin-top: 5px; color: #1e3d59; }
+        .top { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 20px; }
+        a, button { padding: 9px 14px; background: #1e3d59; color: white; text-decoration: none; border: 0; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .secondary { background: #e8eee2; color: #2f3a2f; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; border-bottom: 1px solid #d9e2d0; text-align: left; }
+        th { background: #f4f7f2; color: #1e3d59; font-size: 0.9em; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.82em; font-weight: bold; }
+        .badge-PENDING { background: #fef3c7; color: #b45309; }
+        .badge-ALLOCATED { background: #dcfce7; color: #15803d; }
+        .badge-COMPLETED { background: #e2e8f0; color: #334155; }
+        .btn-log { background: #d35400; font-size: 0.8em; padding: 5px 10px; border-radius: 4px; display: inline-block; }
+        .btn-log:hover { background: #b34300; }
+        .status-select { padding: 5px; border-radius: 4px; border: 1px solid #cbd5e0; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+<main>
+    <section>
+        <div class="top">
+            <div>
+                <p class="eyebrow">Safari Guide Portal &bull; Field Operations</p>
+                <h1>My Assigned Bookings & Schedule</h1>
+            </div>
+            <div>
+                <a href="guide-dashboard.html" class="secondary">&larr; Guide Dashboard</a>
+                <a href="log-sighting.html">+ Log Sighting</a>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Booking Ref</th>
+                <th>Package & Destination</th>
+                <th>Tour Date</th>
+                <th>Headcount & Tourist</th>
+                <th>Allocated Vehicle</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="tripsTableBody">
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 25px; color: #888;">Loading assigned trips...</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+
+<script>
+    async function loadTrips() {
+        const tbody = document.getElementById('tripsTableBody');
+        try {
+            const res = await fetch('/api/guide/allocations');
+            if (!res.ok) throw new Error("Could not fetch guide trips");
+            const trips = await res.json();
+
+            if (!trips || trips.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #777;">No assigned safari trips at present.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = trips.map(t => `
+                <tr>
+                    <td><strong>${t.bookingRef}</strong></td>
+                    <td>
+                        <strong>${t.packageName}</strong><br>
+                        <small style="color:#666;">📍 ${t.destination}</small>
+                    </td>
+                    <td><strong>${t.travelDate}</strong></td>
+                    <td>
+                        ${t.participantsCount} Pax<br>
+                        <small style="color:#555;">${t.touristName} (${t.touristPhone || 'N/A'})</small>
+                    </td>
+                    <td>${t.assignedVehicle || '<span style="color:#888;">Pending Fleet Assign</span>'}</td>
+                    <td>
+                        <span class="badge badge-${t.status}">${t.status}</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <select class="status-select" onchange="updateTripStatus(${t.bookingId}, this.value)">
+                                <option value="ALLOCATED" ${t.status === 'ALLOCATED' ? 'selected' : ''}>ALLOCATED</option>
+                                <option value="COMPLETED" ${t.status === 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
+                                <option value="CANCELLED" ${t.status === 'CANCELLED' ? 'selected' : ''}>CANCELLED</option>
+                            </select>
+                            <a class="btn-log" href="log-sighting.html?tripId=${encodeURIComponent(t.bookingRef)}&park=${encodeURIComponent(t.destination)}">Log Sighting</a>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #c0392b;">Error loading assigned trips from server.</td></tr>';
+        }
+    }
+
+    async function updateTripStatus(id, newStatus) {
+        try {
+            const res = await fetch(`/api/bookings/${id}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (res.ok) {
+                loadTrips();
+            } else {
+                alert("Failed to update status");
+            }
+        } catch (e) {
+            alert("Server connection error.");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadTrips);
+</script>
+</body>
+</html>

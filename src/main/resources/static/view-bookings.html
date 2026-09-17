@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Ongoing Bookings - Lanka Wild Trails</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f4f7f2; color: #1f2933; }
+        main { padding: 30px; }
+        section { max-width: 1050px; margin: auto; padding: 28px; background: white; border: 1px solid #d9e2d0; border-radius: 8px; }
+        .eyebrow { color: #3f6b35; font-weight: bold; text-transform: uppercase; font-size: 0.85em; }
+        h1 { margin-top: 5px; color: #2c3e50; }
+        .top { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 20px; }
+        a, button { padding: 9px 14px; background: #3f6b35; color: white; text-decoration: none; border: 0; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .secondary { background: #e8eee2; color: #2f3a2f; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; border-bottom: 1px solid #d9e2d0; text-align: left; }
+        th { background: #f4f7f2; color: #2f5d24; font-size: 0.9em; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.82em; font-weight: bold; }
+        .badge-PENDING { background: #fef3c7; color: #b45309; }
+        .badge-CONFIRMED { background: #dbeafe; color: #1e40af; }
+        .badge-ALLOCATED { background: #dcfce7; color: #15803d; }
+        .badge-COMPLETED { background: #e2e8f0; color: #334155; }
+        .badge-CANCELLED { background: #fee2e2; color: #b91c1c; }
+        .btn-cancel { background: #c0392b; color: white; padding: 6px 10px; font-size: 0.8em; border-radius: 4px; }
+        .btn-cancel:hover { background: #a93226; }
+        .alert { padding: 10px 14px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+<main>
+    <section>
+        <div class="top">
+            <div>
+                <p class="eyebrow">Tourist Portal &bull; Reservation Tracking</p>
+                <h1>My Ongoing Safari Bookings</h1>
+            </div>
+            <div>
+                <a href="tourist-dashboard.html" class="secondary">&larr; Dashboard</a>
+                <a href="tourist-packages.html">+ Explore Packages</a>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Booking Ref</th>
+                <th>Tour Package</th>
+                <th>Travel Date</th>
+                <th>Participants</th>
+                <th>Total Price</th>
+                <th>Assigned Resources</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="bookingsTableBody">
+            <tr>
+                <td colspan="8" style="text-align: center; color: #888;">Loading your bookings...</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+
+<script>
+    function showAlert(msg, isSuccess) {
+        const box = document.getElementById('alertBox');
+        box.className = 'alert ' + (isSuccess ? 'alert-success' : 'alert-error');
+        box.innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    async function loadBookings() {
+        const tbody = document.getElementById('bookingsTableBody');
+        try {
+            const res = await fetch('/api/bookings/my');
+            if (!res.ok) throw new Error("Could not load bookings");
+            const bookings = await res.json();
+
+            if (!bookings || bookings.length === 0) {
+                tbody.innerHTML = `<tr>
+                    <td colspan="8" style="text-align: center; padding: 30px; color: #666;">
+                        You have no active bookings right now.<br><br>
+                        <a href="tourist-packages.html" style="display: inline-block;">Browse Safari Packages Now &rarr;</a>
+                    </td>
+                </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = bookings.map(b => {
+                const canCancel = b.status !== 'CANCELLED' && b.status !== 'COMPLETED';
+                const resources = `
+                    <small>
+                        <strong>Guide:</strong> ${b.assignedGuide || 'Pending'}<br>
+                        <strong>Vehicle:</strong> ${b.assignedVehicle || 'Pending'}
+                    </small>
+                `;
+
+                return `
+                <tr>
+                    <td><strong>${b.bookingRef}</strong></td>
+                    <td>
+                        <strong>${b.packageName}</strong><br>
+                        <small style="color: #666;">📍 ${b.destination}</small>
+                    </td>
+                    <td>${b.travelDate}</td>
+                    <td>${b.participantsCount} Pax</td>
+                    <td><strong>Rs. ${Number(b.totalPrice).toLocaleString()}</strong></td>
+                    <td>${resources}</td>
+                    <td><span class="badge badge-${b.status}">${b.status}</span></td>
+                    <td>
+                        ${canCancel ? `<button class="btn-cancel" onclick="cancelBooking(${b.bookingId}, '${b.bookingRef}')">Cancel</button>` : `<span style="color:#888; font-size:0.85em;">N/A</span>`}
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        } catch (err) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #c0392b;">Error loading bookings from server.</td></tr>';
+        }
+    }
+
+    async function cancelBooking(id, ref) {
+        if (!confirm(`Are you sure you want to cancel booking ${ref}?`)) return;
+
+        try {
+            const res = await fetch(`/api/bookings/${id}/cancel`, { method: 'POST' });
+            if (res.ok) {
+                showAlert(`Booking ${ref} was cancelled successfully.`, true);
+                loadBookings();
+            } else {
+                const err = await res.json();
+                showAlert(err.error || "Failed to cancel booking", false);
+            }
+        } catch (e) {
+            showAlert("Server error while cancelling booking.", false);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBookings);
+</script>
+</body>
+</html>

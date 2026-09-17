@@ -116,8 +116,8 @@
 <div class="header-nav">
     <h1>Lanka Wild Trails</h1>
     <div class="user-welcome">
-        Welcome, <strong>Tourist</strong> |
-        <a href="login.html" class="logout-btn">Logout</a>
+        Welcome, <strong id="touristNameDisplay">Tourist</strong> |
+        <a href="#" onclick="logout()" class="logout-btn">Logout</a>
     </div>
 </div>
 
@@ -127,7 +127,7 @@
 
     <div class="menu-grid">
 
-        <a href="tourist-packages.html" class="menu-card">ddd
+        <a href="tourist-packages.html" class="menu-card">
             <div>
                 <div class="card-icon">🐘</div>
                 <div class="card-title">Safari Packages</div>
@@ -136,7 +136,7 @@
             <div class="card-link-text">Explore Packages &rarr;</div>
         </a>
 
-        <a href="reserve-cottage.html" class="menu-card">
+        <a href="cottage.html" class="menu-card">
             <div>
                 <div class="card-icon">🏡</div>
                 <div class="card-title">Reserve Cottages</div>
@@ -154,7 +154,7 @@
             <div class="card-link-text">View My Bookings &rarr;</div>
         </a>
 
-        <a href="wildlife-info.html" class="menu-card">
+        <a href="wildlife-catalogue.html" class="menu-card">
             <div>
                 <div class="card-icon">📖</div>
                 <div class="card-title">Wildlife Info Section</div>
@@ -162,7 +162,6 @@
             </div>
             <div class="card-link-text">Browse Species Guide &rarr;</div>
         </a>
-
 
         <a href="approved-sightings.html" class="menu-card">
             <div>
@@ -185,5 +184,23 @@
     </div>
 </div>
 
+<script>
+    async function initTourist() {
+        try {
+            const res = await fetch('/api/user/profile');
+            if (res.ok) {
+                const u = await res.json();
+                document.getElementById('touristNameDisplay').innerText = u.fullName;
+            }
+        } catch(e) {}
+    }
+
+    async function logout() {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = 'login.html';
+    }
+
+    initTourist();
+</script>
 </body>
 </html>

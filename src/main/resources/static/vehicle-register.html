@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Vehicle</title>
+    <title>Register Vehicle - Lanka Wild Trails</title>
     <style>
         body { margin: 0; font-family: Arial, sans-serif; background: #f4f7f2; color: #1f2933; }
         main { padding: 30px; } section { max-width: 850px; margin: auto; padding: 28px; background: white; border: 1px solid #d9e2d0; border-radius: 8px; }
         .eyebrow { color: #3f6b35; font-weight: bold; text-transform: uppercase; } h1 { margin-top: 0; }
-        form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        label { font-weight: bold; } input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5c0; border-radius: 6px; box-sizing: border-box; }
-        .full { grid-column: 1 / -1; } .actions { grid-column: 1 / -1; text-align: right; }
-        a, button { padding: 10px 14px; border: 0; border-radius: 6px; font-weight: bold; text-decoration: none; background: #3f6b35; color: white; }
-        .secondary { background: #e8eee2; color: #2f3a2f; }
+        form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 15px; }
+        label { font-weight: bold; margin-bottom: 4px; display: block; font-size: 0.9em; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5c0; border-radius: 6px; box-sizing: border-box; }
+        .full { grid-column: 1 / -1; } .actions { grid-column: 1 / -1; text-align: right; margin-top: 10px; }
+        a, button { padding: 10px 16px; border: 0; border-radius: 6px; font-weight: bold; text-decoration: none; background: #3f6b35; color: white; cursor: pointer; }
+        .secondary { background: #e8eee2; color: #2f3a2f; margin-right: 8px; }
+        .alert { padding: 10px 14px; border-radius: 6px; margin-bottom: 15px; display: none; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     </style>
 </head>
 <body>
@@ -20,19 +24,104 @@
     <section>
         <p class="eyebrow">Vehicle Management</p>
         <h1>Register Safari Vehicle</h1>
-        <form>
-            <div><label>Registration Number</label><input value="WP CAB-1234"></div>
-            <div><label>Vehicle Type</label><input value="Safari Jeep"></div>
-            <div><label>Seating Capacity</label><input type="number" value="6"></div>
-            <div><label>Assigned Driver</label><input value="Nimal Perera"></div>
-            <div><label>Status</label><select><option>AVAILABLE</option><option>IN_USE</option><option>UNDER_MAINTENANCE</option></select></div>
-            <div class="full"><label>Description</label><textarea rows="4">Open safari jeep for wildlife trail trips.</textarea></div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="vehicleRegisterForm" onsubmit="handleRegister(event)">
+            <div>
+                <label for="regNumber">Registration Number *</label>
+                <input type="text" id="regNumber" placeholder="e.g. WP CAB-1234" required>
+            </div>
+            <div>
+                <label for="vehicleType">Vehicle Type *</label>
+                <input type="text" id="vehicleType" placeholder="e.g. Safari Jeep, Land Cruiser" required>
+            </div>
+            <div>
+                <label for="capacity">Seating Capacity (Min: 1) *</label>
+                <input type="number" id="capacity" min="1" placeholder="e.g. 6" required>
+            </div>
+            <div>
+                <label for="driver">Assigned Driver</label>
+                <input type="text" id="driver" placeholder="e.g. Nimal Perera">
+            </div>
+            <div class="full">
+                <label for="status">Initial Availability Status *</label>
+                <select id="status" required>
+                    <option value="AVAILABLE" selected>AVAILABLE</option>
+                    <option value="IN_USE">IN_USE</option>
+                    <option value="UNDER_MAINTENANCE">UNDER_MAINTENANCE</option>
+                    <option value="UNAVAILABLE">UNAVAILABLE</option>
+                </select>
+            </div>
+            <div class="full">
+                <label for="description">Vehicle Description & Features</label>
+                <textarea id="description" rows="3" placeholder="4x4 Open top safari jeep, winch equipped, elevated seats..."></textarea>
+            </div>
             <div class="actions">
                 <a class="secondary" href="vehicles-list.html">Cancel</a>
-                <button type="button">Register Vehicle</button>
+                <button type="submit">Register Vehicle</button>
             </div>
         </form>
     </section>
 </main>
+
+<script>
+    function showAlert(msg, isSuccess) {
+        const box = document.getElementById('alertBox');
+        box.className = 'alert ' + (isSuccess ? 'alert-success' : 'alert-error');
+        box.innerText = msg;
+        box.style.display = 'block';
+    }
+
+    async function handleRegister(event) {
+        event.preventDefault();
+
+        const registrationNumber = document.getElementById('regNumber').value.trim();
+        const vehicleType = document.getElementById('vehicleType').value.trim();
+        const seatingCapacity = parseInt(document.getElementById('capacity').value, 10);
+        const assignedDriver = document.getElementById('driver').value.trim();
+        const status = document.getElementById('status').value;
+        const description = document.getElementById('description').value.trim();
+
+        if (!registrationNumber) {
+            showAlert("Registration number is required.", false);
+            return;
+        }
+
+        if (isNaN(seatingCapacity) || seatingCapacity <= 0) {
+            showAlert("Seating capacity must be a positive number greater than 0.", false);
+            return;
+        }
+
+        const payload = {
+            registrationNumber,
+            vehicleType,
+            seatingCapacity,
+            assignedDriver: assignedDriver || null,
+            status,
+            description: description || null
+        };
+
+        try {
+            const res = await fetch('/api/vehicles', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                showAlert("Vehicle registered successfully! Redirecting...", true);
+                setTimeout(() => {
+                    window.location.href = "vehicles-list.html";
+                }, 1000);
+            } else {
+                const err = await res.json();
+                showAlert(err.error || "Failed to register vehicle.", false);
+            }
+        } catch (e) {
+            showAlert("Server connection error. Please verify backend is running.", false);
+        }
+    }
+</script>
 </body>
 </html>
