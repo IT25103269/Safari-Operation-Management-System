@@ -90,15 +90,15 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'WildlifeSpecies')
 BEGIN
 CREATE TABLE WildlifeSpecies (
-    SpeciesID INT IDENTITY(1,1) PRIMARY KEY,
-    CommonName VARCHAR(100) NOT NULL,
-    ScientificName VARCHAR(150) NOT NULL,
-    Category VARCHAR(50) NOT NULL CHECK (Category IN ('Mammal', 'Bird', 'Reptile', 'Amphibian', 'Other')),
-    ConservationStatus VARCHAR(50) NOT NULL CHECK (ConservationStatus IN ('Critically Endangered', 'Endangered', 'Vulnerable', 'Near Threatened', 'Least Concern')),
-    Habitat VARCHAR(255) NOT NULL,
-    PrimaryPark VARCHAR(100) NOT NULL, -- e.g., Yala, Wilpattu, Udawalawe, Minneriya, Bundala
-    DietaryHabit VARCHAR(50) CHECK (DietaryHabit IN ('Carnivore', 'Herbivore', 'Omnivore', 'Piscivore')),
-    Description VARCHAR(MAX) NOT NULL,
+                                 SpeciesID INT IDENTITY(1,1) PRIMARY KEY,
+                                 CommonName VARCHAR(100) NOT NULL,
+                                 ScientificName VARCHAR(150) NOT NULL,
+                                 Category VARCHAR(50) NOT NULL CHECK (Category IN ('Mammal', 'Bird', 'Reptile', 'Amphibian', 'Other')),
+                                 ConservationStatus VARCHAR(50) NOT NULL CHECK (ConservationStatus IN ('Critically Endangered', 'Endangered', 'Vulnerable', 'Near Threatened', 'Least Concern')),
+                                 Habitat VARCHAR(255) NOT NULL,
+                                 PrimaryPark VARCHAR(100) NOT NULL, -- e.g., Yala, Wilpattu, Udawalawe, Minneriya, Bundala
+                                 DietaryHabit VARCHAR(50) CHECK (DietaryHabit IN ('Carnivore', 'Herbivore', 'Omnivore', 'Piscivore')),
+                                 Description VARCHAR(MAX) NOT NULL,
     BestSpottingTime VARCHAR(150) NULL,
     ImageURL VARCHAR(500) NULL,
     Status VARCHAR(20) DEFAULT 'Active' CHECK (Status IN ('Active', 'Archived')),
@@ -110,5 +110,6 @@ CREATE TABLE WildlifeSpecies (
     INDEX idx_species_park (PrimaryPark),
     INDEX idx_species_status (Status)
 );
+
 END
 GO
