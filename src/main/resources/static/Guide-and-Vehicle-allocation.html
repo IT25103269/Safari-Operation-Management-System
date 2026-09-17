@@ -69,12 +69,37 @@
             border-radius: 8px;
             font-size: 0.9rem;
             font-weight: 500;
+            transition: all 0.2s ease;
         }
+        .nav-link:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.05); }
         .nav-link.active { background-color: var(--primary-accent); color: #ffffff; }
+
+        /* Navigation Header Back Button Styling */
+        .btn-dash-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: var(--primary-dark);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+        .btn-dash-back:hover {
+            background-color: #f1f5f9;
+            border-color: var(--primary-accent);
+            color: var(--primary-accent);
+        }
 
         /* Workspace Layout */
         main { flex: 1; padding: 32px; overflow-y: auto; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .top-right-controls { display: flex; align-items: center; gap: 12px; }
         .admin-badge { background: #dbeafe; color: #1e40af; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
 
         /* Statistical Metric Cards */
@@ -160,7 +185,16 @@
             <span>Lanka Wild Trails</span>
         </div>
         <ul class="nav-menu">
-            <li><a href="#" class="nav-link active"><i class="fa-solid fa-truck-monster"></i> Vehicle & Guide Allocation</a></li>
+            <li>
+                <a href="admin-dashboard.html" class="nav-link">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link active">
+                    <i class="fa-solid fa-truck-monster"></i> Guide & Vehicle Allocation
+                </a>
+            </li>
         </ul>
     </div>
     <div style="font-size: 0.8rem; color: #64748b;">SE2030 Software Engineering</div>
@@ -173,7 +207,11 @@
             <h1 style="font-size: 1.5rem; color: var(--primary-dark);">Vehicle and Guide Allocation</h1>
             <p style="font-size: 0.85rem; color: var(--text-secondary);">Manage, allocate, and edit guide and vehicle assignments.</p>
         </div>
-        <div>
+        <div class="top-right-controls">
+            <!-- Header Level Back to Dashboard Button -->
+            <a href="admin-dashboard.html" class="btn-dash-back">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </a>
             <span class="admin-badge"><i class="fa-solid fa-user-shield"></i> Operations Manager (Nimal)</span>
         </div>
     </div>
@@ -228,7 +266,6 @@
             <button onclick="closeModal()" style="background:none; border:none; color:white; cursor:pointer; font-size:1.2rem;">&times;</button>
         </div>
         <form id="vehicleGuideAllocationForm" onsubmit="handleFormSubmit(event)">
-            <!-- Hidden Field to store Record ID during Edit -->
             <input type="hidden" id="recordId">
 
             <div class="form-group">
@@ -256,7 +293,7 @@
             </div>
 
             <div class="form-group">
-                <label for="guide">Select Safari Guide[cite: 1]</label>
+                <label for="guide">Select Safari Guide</label>
                 <select id="guide">
                     <option value="Unassigned">-- Leave Unassigned --</option>
                     <option value="Sunil Shantha (G-101)">Sunil Shantha (G-101)</option>
@@ -266,7 +303,7 @@
             </div>
 
             <div class="form-group">
-                <label for="vehicle">Select Capacity-Matched Vehicle[cite: 1]</label>
+                <label for="vehicle">Select Capacity-Matched Vehicle</label>
                 <select id="vehicle">
                     <option value="Unassigned">-- Select Package First --</option>
                 </select>
@@ -282,17 +319,17 @@
 
 <!-- Application Script -->
 <script>
-    // 1. Role Authorization Check (Nimal - Operations Manager Admin)[cite: 1]
+    // 1. Role Authorization Check (Nimal - Operations Manager Admin)
     const currentUser = {
         name: "Nimal Perera",
-        role: "OPERATIONS_MANAGER" // Change to "DRIVER" or "TOURIST" to test security lock[cite: 1]
+        role: "OPERATIONS_MANAGER"
     };
 
     if (currentUser.role !== "OPERATIONS_MANAGER") {
         document.getElementById("accessDenied").style.display = "block";
     }
 
-    // 2. Fleet Vehicle Database[cite: 1]
+    // 2. Fleet Vehicle Database
     const vehicleFleet = [
         { id: "V1", regNo: "NC-8822", type: "Land Cruiser", capacity: 6, status: "Available" },
         { id: "V2", regNo: "NC-4521", type: "Toyota Hilux", capacity: 4, status: "Available" },
@@ -393,7 +430,7 @@
     // 6. CREATE: Open Modal for New Record
     function openCreateModal() {
         document.getElementById("vehicleGuideAllocationForm").reset();
-        document.getElementById("recordId").value = ""; // Clear Record ID
+        document.getElementById("recordId").value = "";
         document.getElementById("modalTitle").innerText = "New Vehicle and Guide Allocation";
         document.getElementById("headcountDisplay").innerHTML = `<i class="fa-solid fa-users"></i> Headcount: <strong>Not Selected</strong>`;
         document.getElementById("allocationModal").style.display = "flex";
@@ -410,7 +447,6 @@
         document.getElementById("tripDate").value = record.date;
         document.getElementById("guide").value = record.guide;
 
-        // Trigger headcount update and pre-select the allocated vehicle
         updateHeadcountFromPackage(record.vehicle);
 
         document.getElementById("modalTitle").innerText = "Edit Allocation Entry #" + record.bookingRef;
@@ -421,7 +457,7 @@
         document.getElementById("allocationModal").style.display = "none";
     }
 
-    // 8. UPDATE / SAVE: Handle Form Submission for both Create and Edit
+    // 8. UPDATE / SAVE: Handle Form Submission
     function handleFormSubmit(event) {
         event.preventDefault();
 
@@ -434,11 +470,9 @@
         const guide = document.getElementById("guide").value;
         const vehicle = document.getElementById("vehicle").value;
 
-        // Auto-evaluate allocation status
         const status = (guide !== "Unassigned" && vehicle !== "Unassigned") ? "Allocated" : "Pending";
 
         if (recordId) {
-            // UPDATE Existing Record
             const index = vehicleAndGuideAllocations.findIndex(a => a.id == recordId);
             if (index !== -1) {
                 vehicleAndGuideAllocations[index] = {
@@ -453,7 +487,6 @@
                 };
             }
         } else {
-            // CREATE New Record
             vehicleAndGuideAllocations.push({
                 id: Date.now(),
                 bookingRef,
