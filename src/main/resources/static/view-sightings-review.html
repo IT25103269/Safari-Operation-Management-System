@@ -4,22 +4,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sighting Records - Lanka Wild Trails</title>
+    <!-- FontAwesome Icons for Visual Hierarchy -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-        .container { max-width: 900px; background: white; padding: 20px; margin: auto; border-radius: 5px; }
-        h2 { color: #2c3e50; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #2c3e50; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .badge { background-color: #e74c3c; color: white; padding: 3px 7px; border-radius: 3px; font-size: 12px; }
-        .action-btn { background-color: #2980b9; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px; }
+        :root {
+            --primary-dark: #2c3e50;
+            --primary-accent: #2980b9;
+            --bg-canvas: #f4f4f4;
+            --card-bg: #ffffff;
+            --border-subtle: #ddd;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: var(--bg-canvas);
+        }
+
+        .container {
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 24px;
+            margin: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        h2 {
+            color: var(--primary-dark);
+            margin: 0;
+        }
+
+        /* Navigation Controls */
+        .btn-dash-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #ffffff;
+            color: var(--primary-dark);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-dash-back:hover {
+            background-color: #e2e8f0;
+            color: var(--primary-accent);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-subtle);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-dark);
+            color: white;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .badge {
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .action-btn {
+            background-color: var(--primary-accent);
+            color: white;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 12px;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: #1c5980;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Recent Wildlife Sightings</h2>
+    <!-- Header Section with Back to Dashboard Button -->
+    <div class="header-bar">
+        <h2>Recent Wildlife Sightings</h2>
+        <a href="admin-dashboard.html" class="btn-dash-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
 
     <table>
         <thead>

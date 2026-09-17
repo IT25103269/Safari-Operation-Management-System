@@ -44,7 +44,7 @@ public class LoginService {
 
         return switch (role.trim().toLowerCase()) {
             case "admin" -> "/admin-dashboard.html";
-            case "manager" -> "/cottage-dashboard.html";
+            case "manager" -> "/cottage.html";
             case "guide" -> "/guide-dashboard.html";
             case "tourist" -> "/tourist-dashboard.html";
             case "driver" -> "/driver-dashboard.html";
