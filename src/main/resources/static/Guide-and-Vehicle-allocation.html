@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Vehicle and Guide Allocation</title>
-    <!-- FontAwesome Icons for UI Scaffolding -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -28,18 +27,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
         body { background-color: var(--bg-canvas); color: var(--text-primary); display: flex; min-height: 100vh; }
 
-        /* Security Guard Page Overlay */
-        #accessDenied {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff;
-            z-index: 9999;
-            text-align: center;
-            padding-top: 100px;
-        }
-
-        /* Sidebar Scaffolding */
         aside {
             width: 260px;
             background-color: var(--primary-dark);
@@ -73,6 +60,7 @@
         }
         .nav-link:hover { color: #ffffff; background-color: rgba(255, 255, 255, 0.05); }
         .nav-link.active { background-color: var(--primary-accent); color: #ffffff; }
+        .nav-link:hover { color: #ffffff; background-color: rgba(255,255,255,0.05); }
 
         /* Navigation Header Back Button Styling */
         .btn-dash-back {
@@ -102,13 +90,11 @@
         .top-right-controls { display: flex; align-items: center; gap: 12px; }
         .admin-badge { background: #dbeafe; color: #1e40af; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
 
-        /* Statistical Metric Cards */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 28px; }
         .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); }
         .stat-card h3 { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-card div { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); margin-top: 4px; }
 
-        /* Action Toolbar */
         .toolbar {
             background: var(--card-bg);
             padding: 16px 20px;
@@ -133,7 +119,6 @@
         }
         .btn-create:hover { background: var(--primary-dark); }
 
-        /* Data Table */
         .table-container { background: var(--card-bg); border-radius: 0 0 12px 12px; border: 1px solid var(--border-subtle); overflow-x: auto; box-shadow: var(--shadow-sm); }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
         th { background: #f1f5f9; padding: 14px 20px; color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border-subtle); }
@@ -142,6 +127,8 @@
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
         .badge-pending { background: var(--warning-bg); color: var(--warning-text); }
         .badge-allocated { background: var(--success-bg); color: var(--success-text); }
+        .badge-confirmed { background: #dbeafe; color: #1e40af; }
+        .badge-cancelled { background: var(--danger-bg); color: var(--danger-text); }
 
         .actions-cell { display: flex; gap: 8px; }
         .btn-icon {
@@ -153,7 +140,6 @@
         .btn-icon:hover { border-color: var(--primary-accent); color: var(--primary-accent); background: #f0fdf4; }
         .btn-icon.delete:hover { border-color: var(--danger-text); color: var(--danger-text); background: var(--danger-bg); }
 
-        /* Allocation CRUD Modal */
         .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: var(--card-bg); width: 100%; max-width: 550px; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-md); }
         .modal-header { background: var(--primary-dark); color: white; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
@@ -169,13 +155,6 @@
     </style>
 </head>
 <body>
-
-<!-- Access Control Guard Screen -->
-<div id="accessDenied">
-    <i class="fa-solid fa-lock" style="font-size: 3rem; color: var(--danger-text);"></i>
-    <h1 style="margin-top: 16px;">403 - Access Restricted</h1>
-    <p style="color: var(--text-secondary); margin-top: 8px;">Only Operations Managers (Admin) are authorized to access Vehicle and Guide Allocations.</p>
-</div>
 
 <!-- Navigation Sidebar -->
 <aside>
@@ -205,7 +184,7 @@
     <div class="top-bar">
         <div>
             <h1 style="font-size: 1.5rem; color: var(--primary-dark);">Vehicle and Guide Allocation</h1>
-            <p style="font-size: 0.85rem; color: var(--text-secondary);">Manage, allocate, and edit guide and vehicle assignments.</p>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Manage, allocate, and edit guide and vehicle assignments for confirmed bookings.</p>
         </div>
         <div class="top-right-controls">
             <!-- Header Level Back to Dashboard Button -->
@@ -219,7 +198,7 @@
     <!-- Dashboard Metrics -->
     <div class="stats-grid">
         <div class="stat-card">
-            <h3>Total Allocations</h3>
+            <h3>Total Bookings</h3>
             <div id="stat-total">0</div>
         </div>
         <div class="stat-card">
@@ -234,8 +213,8 @@
 
     <!-- Table Controls Header -->
     <div class="toolbar">
-        <div style="font-weight: 600; color: var(--primary-dark);">Vehicle and Guide Allocation Table</div>
-        <button class="btn-create" onclick="openCreateModal()"><i class="fa-solid fa-plus"></i> New Allocation Entry</button>
+        <div style="font-weight: 600; color: var(--primary-dark);">Trip Allocations Master Table</div>
+        <button class="btn-create" onclick="refreshData()"><i class="fa-solid fa-arrows-rotate"></i> Refresh Allocations</button>
     </div>
 
     <!-- Allocation Records Table -->
@@ -253,52 +232,52 @@
                 <th>Actions</th>
             </tr>
             </thead>
-            <tbody id="vehicleGuideAllocationTableBody"></tbody>
+            <tbody id="vehicleGuideAllocationTableBody">
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 20px; color: #888;">Loading allocations from database...</td>
+            </tr>
+            </tbody>
         </table>
     </div>
 </main>
 
-<!-- Modal Form (Handles Create and Edit Operations) -->
+<!-- Modal Form for Allocation -->
 <div class="modal-backdrop" id="allocationModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 id="modalTitle" style="font-size: 1.1rem;">Manage Allocation Record</h2>
+            <h2 id="modalTitle" style="font-size: 1.1rem;">Allocate Guide & Vehicle</h2>
             <button onclick="closeModal()" style="background:none; border:none; color:white; cursor:pointer; font-size:1.2rem;">&times;</button>
         </div>
         <form id="vehicleGuideAllocationForm" onsubmit="handleFormSubmit(event)">
             <input type="hidden" id="recordId">
 
             <div class="form-group">
-                <label for="bookingRef">Booking Reference #</label>
-                <input type="text" id="bookingRef" required placeholder="e.g., LWT-2026-101">
+                <label>Booking Reference</label>
+                <input type="text" id="bookingRef" readonly style="background:#f1f5f9;">
             </div>
 
             <div class="form-group">
-                <label for="packageSelect">Safari Package (Defines Headcount)</label>
-                <select id="packageSelect" onchange="updateHeadcountFromPackage()" required>
-                    <option value="">-- Select Safari Package --</option>
-                    <option value="Yala Leopard Special" data-headcount="4">Yala Leopard Special (4 Passengers)</option>
-                    <option value="Udawalawe Elephant Safari" data-headcount="6">Udawalawe Elephant Safari (6 Passengers)</option>
-                    <option value="Wilpattu Bird Watching" data-headcount="2">Wilpattu Bird Watching (2 Passengers)</option>
-                </select>
+                <label>Package & Headcount</label>
+                <input type="text" id="packageInfo" readonly style="background:#f1f5f9;">
             </div>
 
             <div class="headcount-info" id="headcountDisplay">
-                <i class="fa-solid fa-users"></i> Headcount: <strong>Not Selected</strong>
+                <i class="fa-solid fa-users"></i> Headcount: <strong>-</strong>
             </div>
 
             <div class="form-group">
-                <label for="tripDate">Trip Date</label>
-                <input type="date" id="tripDate" required>
+                <label>Trip Date</label>
+                <input type="text" id="tripDate" readonly style="background:#f1f5f9;">
             </div>
 
             <div class="form-group">
                 <label for="guide">Select Safari Guide</label>
                 <select id="guide">
                     <option value="Unassigned">-- Leave Unassigned --</option>
-                    <option value="Sunil Shantha (G-101)">Sunil Shantha (G-101)</option>
-                    <option value="Kasun Perera (G-102)">Kasun Perera (G-102)</option>
-                    <option value="Nimal Jayasinghe (G-104)">Nimal Jayasinghe (G-104)</option>
+                    <option value="Sunil Shantha (Guide)">Sunil Shantha (Guide)</option>
+                    <option value="Kasun Perera (Guide)">Kasun Perera (Guide)</option>
+                    <option value="Nimal Jayasinghe (Guide)">Nimal Jayasinghe (Guide)</option>
+                    <option value="Sampath Ekanayake (Driver/Guide)">Sampath Ekanayake (Driver/Guide)</option>
                 </select>
             </div>
 
@@ -317,7 +296,6 @@
     </div>
 </div>
 
-<!-- Application Script -->
 <script>
     // 1. Role Authorization Check (Nimal - Operations Manager Admin)
     const currentUser = {
@@ -363,58 +341,62 @@
         }
     ];
 
-    // 4. Dynamic Capacity Filter Function
-    function updateHeadcountFromPackage(preselectedVehicle = null) {
-        const packageSelect = document.getElementById("packageSelect");
-        const selectedOption = packageSelect.options[packageSelect.selectedIndex];
-        const headcount = selectedOption ? selectedOption.getAttribute("data-headcount") : null;
-        const vehicleSelect = document.getElementById("vehicle");
+    async function refreshData() {
+        await loadVehicles();
+        await loadBookings();
+    }
 
-        if (!headcount) {
-            document.getElementById("headcountDisplay").innerHTML = `<i class="fa-solid fa-users"></i> Headcount: <strong>Not Selected</strong>`;
-            vehicleSelect.innerHTML = `<option value="Unassigned">-- Select Package First --</option>`;
-            return;
-        }
-
-        document.getElementById("headcountDisplay").innerHTML = `<i class="fa-solid fa-users"></i> Headcount: <strong>${headcount} Passengers</strong> (Showing vehicles with Capacity &ge; ${headcount})`;
-
-        const eligibleVehicles = vehicleFleet.filter(v => v.capacity >= headcount && v.status === "Available");
-
-        vehicleSelect.innerHTML = `<option value="Unassigned">-- Leave Unassigned --</option>`;
-        if (eligibleVehicles.length === 0) {
-            vehicleSelect.innerHTML += `<option value="" disabled>❌ No vehicle available for capacity ${headcount}</option>`;
-        } else {
-            eligibleVehicles.forEach(v => {
-                const valueStr = `${v.regNo} (${v.type} - Cap: ${v.capacity})`;
-                const isSelected = (preselectedVehicle === valueStr) ? "selected" : "";
-                vehicleSelect.innerHTML += `<option value="${valueStr}" ${isSelected}>${v.regNo} - ${v.type} (Cap: ${v.capacity})</option>`;
-            });
+    async function loadVehicles() {
+        try {
+            const res = await fetch('/api/vehicles');
+            if (res.ok) {
+                fleetVehicles = await res.json();
+            }
+        } catch (e) {
+            console.warn("Could not load vehicles", e);
         }
     }
 
-    // 5. READ: Render Table Rows and Stats
+    async function loadBookings() {
+        const tbody = document.getElementById("vehicleGuideAllocationTableBody");
+        try {
+            const res = await fetch('/api/bookings');
+            if (!res.ok) throw new Error("Could not load bookings");
+            bookingsMaster = await res.json();
+
+            if (!bookingsMaster || bookingsMaster.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px; color: #888;">No safari bookings placed yet. Bookings from tourists will appear here automatically.</td></tr>';
+                updateStats();
+                return;
+            }
+
+            renderTable();
+        } catch (err) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #c0392b;">Error connecting to bookings API.</td></tr>';
+        }
+    }
+
     function renderTable() {
         const tbody = document.getElementById("vehicleGuideAllocationTableBody");
         tbody.innerHTML = "";
 
-        vehicleAndGuideAllocations.forEach(item => {
-            const badgeClass = item.status === "Allocated" ? "badge-allocated" : "badge-pending";
+        bookingsMaster.forEach(item => {
+            const statusKey = (item.status || 'PENDING').toLowerCase();
+            const badgeClass = 'badge-' + statusKey;
+
             tbody.innerHTML += `
                 <tr>
                     <td style="font-weight:700; color:var(--primary-dark);">${item.bookingRef}</td>
-                    <td>${item.tourist} (${item.headcount} Pax)</td>
-                    <td>${item.package}</td>
-                    <td>${item.date}</td>
-                    <td>${item.guide}</td>
-                    <td>${item.vehicle}</td>
+                    <td>${item.touristName} (${item.participantsCount} Pax)</td>
+                    <td><strong>${item.packageName}</strong><br><small style="color:#666;">${item.destination}</small></td>
+                    <td>${item.travelDate}</td>
+                    <td>${item.assignedGuide || '<span style="color:#94a3b8;">Unassigned</span>'}</td>
+                    <td>${item.assignedVehicle || '<span style="color:#94a3b8;">Unassigned</span>'}</td>
                     <td><span class="badge ${badgeClass}">${item.status}</span></td>
                     <td>
                         <div class="actions-cell">
-                            <button class="btn-icon" title="Edit Allocation" onclick="openEditModal(${item.id})">
+                            <button class="btn-icon" title="Allocate Guide & Vehicle" onclick="openAllocateModal(${item.bookingId})">
                                 <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            <button class="btn-icon delete" title="Delete Entry" onclick="deleteRecord(${item.id})">
-                                <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
                     </td>
@@ -422,9 +404,7 @@
             `;
         });
 
-        document.getElementById("stat-total").innerText = vehicleAndGuideAllocations.length;
-        document.getElementById("stat-pending").innerText = vehicleAndGuideAllocations.filter(a => a.status === "Pending").length;
-        document.getElementById("stat-assigned").innerText = vehicleAndGuideAllocations.filter(a => a.status === "Allocated").length;
+        updateStats();
     }
 
     // 6. CREATE: Open Modal for New Record
@@ -436,20 +416,32 @@
         document.getElementById("allocationModal").style.display = "flex";
     }
 
-    // 7. EDIT: Open Modal Pre-Populated with Existing Record Data
-    function openEditModal(id) {
-        const record = vehicleAndGuideAllocations.find(a => a.id === id);
-        if (!record) return;
+    function openAllocateModal(bookingId) {
+        const item = bookingsMaster.find(b => b.bookingId === bookingId);
+        if (!item) return;
 
-        document.getElementById("recordId").value = record.id;
-        document.getElementById("bookingRef").value = record.bookingRef;
-        document.getElementById("packageSelect").value = record.package;
-        document.getElementById("tripDate").value = record.date;
-        document.getElementById("guide").value = record.guide;
+        document.getElementById("bookingId").value = item.bookingId;
+        document.getElementById("bookingRef").value = item.bookingRef;
+        document.getElementById("packageInfo").value = `${item.packageName} (${item.participantsCount} Passengers)`;
+        document.getElementById("tripDate").value = item.travelDate;
+        document.getElementById("guide").value = item.assignedGuide || "Unassigned";
+
+        const headcount = item.participantsCount;
+        document.getElementById("headcountDisplay").innerHTML = `<i class="fa-solid fa-users"></i> Headcount: <strong>${headcount} Passengers</strong> (Showing Available Vehicles &ge; ${headcount} seats)`;
 
         updateHeadcountFromPackage(record.vehicle);
 
-        document.getElementById("modalTitle").innerText = "Edit Allocation Entry #" + record.bookingRef;
+        if (eligible.length === 0) {
+            vehicleSelect.innerHTML += `<option value="" disabled>❌ No AVAILABLE vehicle with capacity &ge; ${headcount}</option>`;
+        } else {
+            eligible.forEach(v => {
+                const val = `${v.registrationNumber} (${v.vehicleType} - Cap: ${v.seatingCapacity})`;
+                const isSel = (item.assignedVehicle && item.assignedVehicle.includes(v.registrationNumber)) ? "selected" : "";
+                vehicleSelect.innerHTML += `<option value="${val}" ${isSel}>${v.registrationNumber} - ${v.vehicleType} (Cap: ${v.seatingCapacity})</option>`;
+            });
+        }
+
+        document.getElementById("modalTitle").innerText = "Allocate Resources: " + item.bookingRef;
         document.getElementById("allocationModal").style.display = "flex";
     }
 
@@ -461,12 +453,7 @@
     function handleFormSubmit(event) {
         event.preventDefault();
 
-        const recordId = document.getElementById("recordId").value;
-        const bookingRef = document.getElementById("bookingRef").value;
-        const packageSelect = document.getElementById("packageSelect");
-        const packageName = packageSelect.value;
-        const headcount = packageSelect.options[packageSelect.selectedIndex].getAttribute("data-headcount");
-        const date = document.getElementById("tripDate").value;
+        const bookingId = document.getElementById("bookingId").value;
         const guide = document.getElementById("guide").value;
         const vehicle = document.getElementById("vehicle").value;
 
@@ -498,21 +485,21 @@
                 vehicle,
                 status
             });
-        }
 
-        closeModal();
-        renderTable();
+            if (res.ok) {
+                alert("Resources allocated successfully!");
+                closeModal();
+                refreshData();
+            } else {
+                const err = await res.json();
+                alert(err.error || "Allocation failed. Please check vehicle availability.");
+            }
+        } catch (e) {
+            alert("Server connection error.");
+        }
     }
 
-    // 9. DELETE: Remove Allocation Record
-    function deleteRecord(id) {
-        if (confirm("Are you sure you want to delete this allocation record?")) {
-            vehicleAndGuideAllocations = vehicleAndGuideAllocations.filter(a => a.id !== id);
-            renderTable();
-        }
-    }
-
-    window.onload = renderTable;
+    window.onload = refreshData;
 </script>
 </body>
 </html>

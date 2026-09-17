@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vehicle List</title>
+    <title>Vehicle List - Lanka Wild Trails</title>
     <style>
         body { margin: 0; font-family: Arial, sans-serif; background: #f4f7f2; color: #1f2933; }
         main { padding: 30px; }
@@ -14,10 +14,19 @@
         .top { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
         form { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; padding: 14px; background: #f8fbf6; border: 1px solid #d9e2d0; border-radius: 6px; }
         input, select { padding: 10px; border: 1px solid #cbd5c0; border-radius: 6px; }
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 12px; border-bottom: 1px solid #d9e2d0; text-align: left; }
         th { background: #f4f7f2; color: #2f5d24; }
-        .link { color: #2f5d24; background: transparent; padding: 0; margin-right: 10px; }
+        .link { color: #2f5d24; background: transparent; padding: 0; margin-right: 12px; text-decoration: underline; }
+        .link-danger { color: #c0392b; background: transparent; padding: 0; text-decoration: underline; }
+        .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
+        .status-AVAILABLE { background: #dcfce7; color: #15803d; }
+        .status-IN_USE { background: #e0f2fe; color: #0369a1; }
+        .status-UNDER_MAINTENANCE { background: #fef3c7; color: #b45309; }
+        .status-UNAVAILABLE { background: #fee2e2; color: #b91c1c; }
+        .alert { padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
@@ -28,20 +37,25 @@
                 <p class="eyebrow">Vehicle Management</p>
                 <h1>Registered Vehicles</h1>
             </div>
-            <a href="vehicle-register.html">Register New Vehicle</a>
+            <div>
+                <a href="admin-dashboard.html" class="secondary" style="margin-right:8px;">&larr; Admin Portal</a>
+                <a href="vehicle-register.html">+ Register New Vehicle</a>
+            </div>
         </div>
 
-        <form>
-            <input type="text" placeholder="Registration number or vehicle type">
-            <select>
-                <option>All statuses</option>
-                <option>AVAILABLE</option>
-                <option>IN_USE</option>
-                <option>UNDER_MAINTENANCE</option>
-                <option>UNAVAILABLE</option>
+        <div id="alertBox" class="alert"></div>
+
+        <form id="filterForm" onsubmit="event.preventDefault(); loadVehicles();">
+            <input type="text" id="searchInput" placeholder="Search registration, type, or driver...">
+            <select id="statusFilter">
+                <option value="">All statuses</option>
+                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="IN_USE">IN_USE</option>
+                <option value="UNDER_MAINTENANCE">UNDER_MAINTENANCE</option>
+                <option value="UNAVAILABLE">UNAVAILABLE</option>
             </select>
-            <button type="button">Apply Filter</button>
-            <a class="secondary" href="vehicles-list.html">Clear</a>
+            <button type="submit">Apply Filter</button>
+            <button type="button" class="secondary" onclick="clearFilter()">Clear</button>
         </form>
 
         <table>
@@ -55,28 +69,9 @@
                 <th>Action</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="vehicleTableBody">
             <tr>
-                <td>WP CAB-1234</td>
-                <td>Safari Jeep</td>
-                <td>6</td>
-                <td>Nimal Perera</td>
-                <td>AVAILABLE</td>
-                <td>
-                    <a class="link" href="vehicle-details.html">View</a>
-                    <a class="link" href="vehicle-edit.html">Edit</a>
-                </td>
-            </tr>
-            <tr>
-                <td>CP VAN-7788</td>
-                <td>Safari Van</td>
-                <td>10</td>
-                <td>Not assigned</td>
-                <td>UNDER_MAINTENANCE</td>
-                <td>
-                    <a class="link" href="vehicle-details.html">View</a>
-                    <a class="link" href="vehicle-edit.html">Edit</a>
-                </td>
+                <td colspan="6" style="text-align: center; color: #888;">Loading vehicles...</td>
             </tr>
             </tbody>
         </table>
@@ -84,5 +79,81 @@
         <p style="margin-top:20px;"><a class="secondary" href="guide-dashboard.html">Back to Home</a></p>
     </section>
 </main>
+
+<script>
+    function showAlert(msg, isSuccess) {
+        const box = document.getElementById('alertBox');
+        box.className = 'alert ' + (isSuccess ? 'alert-success' : 'alert-error');
+        box.innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    async function loadVehicles() {
+        const search = document.getElementById('searchInput').value.trim();
+        const status = document.getElementById('statusFilter').value.trim();
+        const tbody = document.getElementById('vehicleTableBody');
+
+        try {
+            let url = '/api/vehicles?';
+            if (search) url += 'search=' + encodeURIComponent(search) + '&';
+            if (status) url += 'status=' + encodeURIComponent(status);
+
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Could not fetch vehicles");
+            const data = await res.json();
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888;">No vehicles found matching criteria.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(v => {
+                const statusClass = 'status-' + (v.status || 'AVAILABLE');
+                return `
+                <tr>
+                    <td><strong>${v.registrationNumber}</strong></td>
+                    <td>${v.vehicleType}</td>
+                    <td>${v.seatingCapacity} Passengers</td>
+                    <td>${v.assignedDriver || '<span style="color:#888;">Unassigned</span>'}</td>
+                    <td><span class="status-badge ${statusClass}">${v.status}</span></td>
+                    <td>
+                        <a class="link" href="vehicle-details.html?id=${v.id}">View</a>
+                        <a class="link" href="vehicle-edit.html?id=${v.id}">Edit</a>
+                        <button class="link-danger" onclick="deleteVehicle(${v.id}, '${v.registrationNumber}')">Delete</button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        } catch (err) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #c0392b;">Error loading vehicles from server.</td></tr>';
+        }
+    }
+
+    function clearFilter() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('statusFilter').value = '';
+        loadVehicles();
+    }
+
+    async function deleteVehicle(id, regNo) {
+        if (!confirm(`Are you sure you want to delete vehicle ${regNo}?`)) return;
+
+        try {
+            const res = await fetch('/api/vehicles/' + id, { method: 'DELETE' });
+            if (res.ok) {
+                showAlert(`Vehicle ${regNo} deleted successfully.`, true);
+                loadVehicles();
+            } else {
+                const err = await res.json();
+                showAlert(err.error || 'Failed to delete vehicle.', false);
+            }
+        } catch (e) {
+            showAlert('Server error while deleting vehicle.', false);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadVehicles);
+</script>
 </body>
 </html>

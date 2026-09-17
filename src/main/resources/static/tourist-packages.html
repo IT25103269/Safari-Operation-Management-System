@@ -10,7 +10,7 @@
             --accent-color: #d35400;
             --bg-light: #f8f9fa;
             --text-dark: #333;
-            --card-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         body {
@@ -27,6 +27,9 @@
             padding: 3rem 1rem;
             text-align: center;
         }
+
+        .hero h1 { margin: 0 0 10px; font-size: 2.3rem; }
+        .hero p { margin: 0; font-size: 1.1rem; opacity: 0.9; }
 
         .container {
             max-width: 1200px;
@@ -83,69 +86,86 @@
         label {
             font-weight: bold;
             margin-bottom: 0.4rem;
+            font-size: 0.9rem;
         }
 
         input, select {
-            padding: 0.6rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 0.65rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 0.95rem;
         }
 
         .btn-search {
             background-color: var(--accent-color);
             color: white;
             border: none;
-            padding: 0.7rem;
+            padding: 0.75rem;
             font-weight: bold;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: background 0.2s;
         }
+
+        .btn-search:hover { background-color: #b34300; }
 
         .package-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2rem;
         }
 
         .package-card {
             background: white;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
             box-shadow: var(--card-shadow);
             display: flex;
             flex-direction: column;
+            transition: transform 0.2s;
+        }
+
+        .package-card:hover {
+            transform: translateY(-4px);
         }
 
         .package-header {
             background-color: var(--primary-color);
             color: white;
-            padding: 1rem;
+            padding: 1.2rem;
         }
 
         .package-header h3 {
-            margin: 0;
+            margin: 0 0 5px 0;
+            font-size: 1.25rem;
         }
 
         .package-body {
             padding: 1.5rem;
             flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
+
+        .tag-group { margin-bottom: 12px; }
 
         .tag {
             display: inline-block;
             background: #eef5ed;
             color: var(--primary-color);
-            padding: 0.2rem 0.6rem;
+            padding: 0.25rem 0.65rem;
             border-radius: 12px;
             font-size: 0.85rem;
             margin-right: 0.4rem;
             margin-bottom: 0.4rem;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .package-footer {
             padding: 1rem 1.5rem;
-            background: #f1f1f1;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -161,18 +181,48 @@
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
             cursor: pointer;
-            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
         }
+
+        .btn-book:hover { background-color: #23441d; }
+
+        /* Booking Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-card h2 { margin-top: 0; color: var(--primary-color); }
+        .modal-form-group { margin-bottom: 14px; }
+        .modal-form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; }
+        .modal-form-group input, .modal-form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+        .btn-cancel { background: #e2e8f0; color: #4a5568; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="hero">
     <h1>Discover Sri Lanka's Wild Wonders</h1>
-    <p>Find and book your custom safari experience</p>
+    <p>Handcrafted wildlife safari tours across premier national parks</p>
 </div>
 
 <div class="container">
@@ -187,91 +237,216 @@
     <div class="filter-section">
         <div class="filter-grid">
             <div class="form-group">
-                <label for="dest">Destination</label>
-                <select id="dest">
-                    <option value="">All Parks</option>
-                    <option value="yala">Yala National Park</option>
-                    <option value="udawalawe">Udawalawe National Park</option>
-                    <option value="wilpattu">Wilpattu National Park</option>
+                <label for="destFilter">Destination</label>
+                <select id="destFilter">
+                    <option value="">All National Parks</option>
+                    <option value="Yala">Yala National Park</option>
+                    <option value="Udawalawe">Udawalawe National Park</option>
+                    <option value="Wilpattu">Wilpattu National Park</option>
+                    <option value="Minneriya">Minneriya National Park</option>
+                    <option value="Bundala">Bundala National Park</option>
+                    <option value="Sinharaja">Sinharaja Forest Reserve</option>
+                    <option value="Horton Plains">Horton Plains</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="animal">Target Wildlife</label>
-                <input type="text" id="animal" placeholder="e.g. Leopard, Elephant">
+                <label for="queryInput">Keywords / Animal Focus</label>
+                <input type="text" id="queryInput" placeholder="e.g. Leopard, Bear, Elephant">
             </div>
 
             <div class="form-group">
-                <label for="maxPrice">Max Price (Rs.)</label>
-                <input type="number" id="maxPrice" placeholder="500">
+                <label for="maxPriceInput">Max Price (Rs.)</label>
+                <input type="number" id="maxPriceInput" placeholder="e.g. 50000">
             </div>
 
-            <button class="btn-search">Filter Packages</button>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-search" style="flex:1;" onclick="loadPackages()">Filter Packages</button>
+                <button class="btn-search" style="background:#64748b;" onclick="clearFilters()">Reset</button>
+            </div>
         </div>
     </div>
 
-    <!-- Package List -->
-    <div class="package-grid">
-
-        <div class="package-card">
-            <div class="package-header">
-                <h3>Yala Classic Expedition</h3>
-                <small>Yala National Park</small>
-            </div>
-            <div class="package-body">
-                <p>Experience high-density leopard spotting along with sloth bears and crocodiles.</p>
-                <div>
-                    <span class="tag">Leopards</span>
-                    <span class="tag">Sloth Bears</span>
-                    <span class="tag">2 Days</span>
-                </div>
-            </div>
-            <div class="package-footer">
-                <div class="price">Rs.250 <small>/ person</small></div>
-                <button class="btn-book">View Details</button>
-            </div>
-        </div>
-
-        <div class="package-card">
-            <div class="package-header">
-                <h3>Udawalawe Herd Discovery</h3>
-                <small>Udawalawe National Park</small>
-            </div>
-            <div class="package-body">
-                <p>Guaranteed elephant herd sightings and bird watching around the reservoir.</p>
-                <div>
-                    <span class="tag">Elephants</span>
-                    <span class="tag">Birds</span>
-                    <span class="tag">1 Day</span>
-                </div>
-            </div>
-            <div class="package-footer">
-                <div class="price">Rs.120 <small>/ person</small></div>
-                <button class="btn-book">View Details</button>
-            </div>
-        </div>
-
-        <div class="package-card">
-            <div class="package-header">
-                <h3>Wilpattu Wilderness Trail</h3>
-                <small>Wilpattu National Park</small>
-            </div>
-            <div class="package-body">
-                <p>Explore Sri Lanka's largest national park famous for natural lakes (Villus).</p>
-                <div>
-                    <span class="tag">Leopards</span>
-                    <span class="tag">Flora</span>
-                    <span class="tag">3 Days</span>
-                </div>
-            </div>
-            <div class="package-footer">
-                <div class="price">Rs.380 <small>/ person</small></div>
-                <button class="btn-book">View Details</button>
-            </div>
-        </div>
-
+    <!-- Package Grid -->
+    <div class="package-grid" id="packageCardsGrid">
+        <p style="grid-column: 1/-1; text-align: center; color: #888;">Loading packages...</p>
     </div>
 </div>
+
+<!-- Booking Modal -->
+<div class="modal-overlay" id="bookingModal">
+    <div class="modal-card">
+        <h2 id="modalPkgTitle">Book Safari Package</h2>
+        <p id="modalPkgDetails" style="font-size: 0.9em; color: #666; margin-bottom: 16px;"></p>
+
+        <form id="bookForm" onsubmit="submitBooking(event)">
+            <input type="hidden" id="bookPkgId">
+            <input type="hidden" id="bookPkgPrice">
+
+            <div class="modal-form-group">
+                <label for="travelDate">Select Travel Date *</label>
+                <input type="date" id="travelDate" required>
+            </div>
+
+            <div class="modal-form-group">
+                <label for="participants">Number of Participants *</label>
+                <input type="number" id="participants" min="1" max="20" value="2" onchange="calculateTotal()" required>
+            </div>
+
+            <div class="modal-form-group">
+                <label for="touristPhone">Your Contact Phone *</label>
+                <input type="text" id="touristPhone" placeholder="+94 77 123 4567" required>
+            </div>
+
+            <div class="modal-form-group">
+                <label for="specialRequests">Special Requests / Dietary Notes</label>
+                <textarea id="specialRequests" rows="2" placeholder="e.g. Vegetarian meals, early morning departure..."></textarea>
+            </div>
+
+            <div style="background: #f0fdf4; padding: 12px; border-radius: 6px; border: 1px solid #bbf7d0; margin-bottom: 15px;">
+                <strong>Estimated Total: </strong><span id="totalPriceDisplay" style="color: var(--accent-color); font-size: 1.15em; font-weight: bold;">Rs. 0</span>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeBookingModal()">Cancel</button>
+                <button type="submit" class="btn-book">Confirm & Place Booking</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let activePackages = [];
+
+    async function loadPackages() {
+        const dest = document.getElementById('destFilter').value;
+        const query = document.getElementById('queryInput').value.trim();
+        const maxPrice = document.getElementById('maxPriceInput').value;
+        const grid = document.getElementById('packageCardsGrid');
+
+        try {
+            let url = '/api/packages?activeOnly=true&';
+            if (dest) url += 'destination=' + encodeURIComponent(dest) + '&';
+            if (query) url += 'query=' + encodeURIComponent(query) + '&';
+            if (maxPrice) url += 'maxPrice=' + encodeURIComponent(maxPrice);
+
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Could not fetch packages");
+            activePackages = await res.json();
+
+            if (!activePackages || activePackages.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; background: white; border-radius: 8px;">
+                    <h3>No packages found matching your criteria.</h3>
+                    <p style="color: #666;">Try choosing another park or raising max price filter.</p>
+                </div>`;
+                return;
+            }
+
+            grid.innerHTML = activePackages.map(p => `
+                <div class="package-card">
+                    <div class="package-header">
+                        <h3>${p.packageName}</h3>
+                        <small>📍 ${p.destination} &bull; ${p.durationDays} Day(s)</small>
+                    </div>
+                    <div class="package-body">
+                        <p style="font-size: 0.95rem; color: #4a5568; line-height: 1.5;">${p.itinerarySummary}</p>
+                        <div>
+                            <div class="tag-group">
+                                <span class="tag">Max ${p.maxGroupSize} Guests</span>
+                                <span class="tag">${p.includedServices || 'Guided Jeep Tour'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="package-footer">
+                        <div class="price">Rs. ${Number(p.pricePerPerson).toLocaleString()} <small style="font-size: 0.75rem; color: #666;">/ person</small></div>
+                        <button class="btn-book" onclick="openBookingModal(${p.packageId})">Book Now</button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (err) {
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #c0392b;">Error loading safari packages from server.</p>';
+        }
+    }
+
+    function clearFilters() {
+        document.getElementById('destFilter').value = '';
+        document.getElementById('queryInput').value = '';
+        document.getElementById('maxPriceInput').value = '';
+        loadPackages();
+    }
+
+    function openBookingModal(pkgId) {
+        const pkg = activePackages.find(p => p.packageId === pkgId);
+        if (!pkg) return;
+
+        document.getElementById('bookPkgId').value = pkg.packageId;
+        document.getElementById('bookPkgPrice').value = pkg.pricePerPerson;
+        document.getElementById('modalPkgTitle').innerText = "Book " + pkg.packageName;
+        document.getElementById('modalPkgDetails').innerText = `Destination: ${pkg.destination} | Rate: Rs. ${Number(pkg.pricePerPerson).toLocaleString()} per person | Max group size: ${pkg.maxGroupSize}`;
+
+        // Set min date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('travelDate').min = tomorrow.toISOString().split('T')[0];
+        document.getElementById('travelDate').value = tomorrow.toISOString().split('T')[0];
+
+        document.getElementById('participants').max = pkg.maxGroupSize;
+        document.getElementById('participants').value = 2;
+        calculateTotal();
+
+        document.getElementById('bookingModal').style.display = 'flex';
+    }
+
+    function closeBookingModal() {
+        document.getElementById('bookingModal').style.display = 'none';
+    }
+
+    function calculateTotal() {
+        const pricePerPerson = parseFloat(document.getElementById('bookPkgPrice').value) || 0;
+        const count = parseInt(document.getElementById('participants').value, 10) || 1;
+        const total = pricePerPerson * count;
+        document.getElementById('totalPriceDisplay').innerText = "Rs. " + total.toLocaleString();
+    }
+
+    async function submitBooking(event) {
+        event.preventDefault();
+
+        const packageId = document.getElementById('bookPkgId').value;
+        const travelDate = document.getElementById('travelDate').value;
+        const participantsCount = parseInt(document.getElementById('participants').value, 10);
+        const touristPhone = document.getElementById('touristPhone').value.trim();
+        const specialRequests = document.getElementById('specialRequests').value.trim();
+
+        const payload = {
+            packageId: parseInt(packageId, 10),
+            travelDate,
+            participantsCount,
+            touristPhone,
+            specialRequests: specialRequests || null
+        };
+
+        try {
+            const res = await fetch('/api/bookings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                alert(`🎉 Booking confirmed successfully!\nBooking Reference: ${data.bookingRef}\nStatus: ${data.status}\nTotal Price: Rs. ${Number(data.totalPrice).toLocaleString()}`);
+                closeBookingModal();
+                window.location.href = "view-bookings.html";
+            } else {
+                alert("Booking error: " + (data.error || "Please check booking details."));
+            }
+        } catch (e) {
+            alert("Server connection error during booking.");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPackages);
+</script>
 
 </body>
 </html>

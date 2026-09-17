@@ -128,40 +128,86 @@
         <tr>
             <th>Date & Time</th>
             <th>Animal Species</th>
-            <th>Park Location</th>
-            <th>Logged By</th>
+            <th>Park Location & Landmark</th>
+            <th>Logged By (Trip)</th>
+            <th>Notes</th>
             <th>Status</th>
-            <th>Action</th>
+            <th>Officer Action</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="sightingsTableBody">
         <tr>
-            <td>2026-08-22 07:45 AM</td>
-            <td>Sri Lankan Leopard</td>
-            <td>Yala</td>
-            <td>Sampath (Driver)</td>
-            <td><span class="badge" style="background-color: #27ae60;">Verified</span></td>
-            <td><a href="#" class="action-btn">View Details</a></td>
-        </tr>
-        <tr>
-            <td>2026-08-22 09:15 AM</td>
-            <td>Asian Elephant</td>
-            <td>Udawalawe</td>
-            <td>Kusal (Guide)</td>
-            <td><span class="badge" style="background-color: #f39c12;">Pending Review</span></td>
-            <td><a href="#" class="action-btn">Review</a></td>
-        </tr>
-        <tr>
-            <td>2026-08-21 04:30 PM</td>
-            <td>Bear</td>
-            <td>Wilpattu</td>
-            <td>Sampath (Driver)</td>
-            <td><span class="badge" style="background-color: #27ae60;">Verified</span></td>
-            <td><a href="#" class="action-btn">View Details</a></td>
+            <td colspan="7" style="text-align: center; color: #888;">Loading sighting reports...</td>
         </tr>
         </tbody>
     </table>
 </div>
+
+<script>
+    function showAlert(msg) {
+        const box = document.getElementById('alertBox');
+        box.className = 'alert alert-success';
+        box.innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    async function loadSightings() {
+        const tbody = document.getElementById('sightingsTableBody');
+        try {
+            const res = await fetch('/api/sightings');
+            if (!res.ok) throw new Error("Could not load sightings");
+            const data = await res.json();
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 25px; color: #888;">No wildlife sightings recorded yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(s => {
+                const isPending = s.status === 'Pending';
+                return `
+                <tr>
+                    <td><strong>${s.sightingDate}</strong><br><small style="color:#666;">${s.sightingTime}</small></td>
+                    <td><strong>${s.speciesName}</strong></td>
+                    <td>${s.parkLocation}<br><small style="color:#666;">${s.specificLocation || ''}</small></td>
+                    <td>${s.loggedBy || 'Staff'}<br><small style="color:#666;">Ref: ${s.tripRef || 'N/A'}</small></td>
+                    <td style="max-width: 250px;"><small>${s.notes || '-'}</small></td>
+                    <td><span class="badge badge-${s.status}">${s.status}</span></td>
+                    <td>
+                        ${isPending ? `
+                            <button class="action-btn btn-verify" onclick="reviewStatus(${s.sightingId}, 'Verified')"><i class="fa-solid fa-check"></i> Verify</button>
+                            <button class="action-btn btn-reject" onclick="reviewStatus(${s.sightingId}, 'Rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                        ` : `<span style="color:#888; font-size:12px;">Reviewed</span>`}
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #c0392b;">Error loading sightings from server.</td></tr>';
+        }
+    }
+
+    async function reviewStatus(id, newStatus) {
+        try {
+            const res = await fetch(`/api/sightings/${id}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (res.ok) {
+                showAlert(`Sighting #${id} marked as ${newStatus}.`);
+                loadSightings();
+            } else {
+                alert("Failed to update status");
+            }
+        } catch (e) {
+            alert("Server communication error.");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSightings);
+</script>
 
 </body>
 </html>

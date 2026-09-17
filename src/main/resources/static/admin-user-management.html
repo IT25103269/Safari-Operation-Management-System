@@ -6,7 +6,7 @@
     <title>User Role Management - Admin</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; }
-        .container { max-width: 1000px; background: white; padding: 25px; margin: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .container { max-width: 1050px; background: white; padding: 25px; margin: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         h2 { color: #2c3e50; margin-top: 0; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .back-link { color: #2980b9; text-decoration: none; font-weight: bold; font-size: 0.9em; }
@@ -14,10 +14,13 @@
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background-color: #2c3e50; color: white; font-size: 0.9em; }
         tr:nth-child(even) { background-color: #f9f9f9; }
-        select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.9em; }
-        .update-btn { background-color: #27ae60; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em; }
+        select { padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.9em; }
+        .update-btn { background-color: #27ae60; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em; transition: background 0.2s; }
         .update-btn:hover { background-color: #219150; }
-        .role-badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 0.8em; font-weight: bold; background-color: #e2e8f0; color: #334155; }
+        .role-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.82em; font-weight: bold; background-color: #e2e8f0; color: #334155; }
+        .alert { padding: 10px 14px; border-radius: 4px; margin-bottom: 15px; display: none; font-size: 0.9em; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
@@ -28,7 +31,9 @@
         <a href="admin-dashboard.html" class="back-link">&larr; Back to Admin Console</a>
     </div>
 
-    <p style="font-size: 0.9em; color: #555;">Select a new role from the dropdown menu to update system permissions for employee or tourist accounts.</p>
+    <div id="alertBox" class="alert"></div>
+
+    <p style="font-size: 0.9em; color: #555;">Select a new role from the dropdown menu to update system permissions for employee or tourist accounts in the database.</p>
 
     <table>
         <thead>
@@ -41,115 +46,96 @@
             <th>Action</th>
         </tr>
         </thead>
-        <tbody>
-        <!-- Personas mapped directly from project context -->
-        <tr>
-            <td>USR-001</td>
-            <td>Nimal Perera</td>
-            <td>nimal@lankawildtrails.lk</td>
-            <td><span class="role-badge">Operations Manager</span></td>
-            <td>
-                <form action="/update-user-role" method="POST" style="margin:0;">
-                    <input type="hidden" name="userId" value="USR-001">
-                    <select name="newRole">
-                        <option value="Operations Manager" selected>Operations Manager</option>
-                        <option value="Tour Coordinator">Safari Tour Coordinator</option>
-                        <option value="Safari Driver">Safari Driver</option>
-                        <option value="Safari Guide">Safari Guide</option>
-                        <option value="Wildlife Officer">Wildlife Info Officer</option>
-                        <option value="Cottage Manager">Park & Cottage Manager</option>
-                        <option value="Tourist">Tourist</option>
-                    </select>
-            </td>
-            <td><button type="submit" class="update-btn">Update Role</button></form></td>
-        </tr>
-
-        <tr>
-            <td>USR-002</td>
-            <td>Dilani Jayasinghe</td>
-            <td>dilani@lankawildtrails.lk</td>
-            <td><span class="role-badge">Tour Coordinator</span></td>
-            <td>
-                <form action="/update-user-role" method="POST" style="margin:0;">
-                    <input type="hidden" name="userId" value="USR-002">
-                    <select name="newRole">
-                        <option value="Operations Manager">Operations Manager</option>
-                        <option value="Tour Coordinator" selected>Safari Tour Coordinator</option>
-                        <option value="Safari Driver">Safari Driver</option>
-                        <option value="Safari Guide">Safari Guide</option>
-                        <option value="Wildlife Officer">Wildlife Info Officer</option>
-                        <option value="Cottage Manager">Park & Cottage Manager</option>
-                        <option value="Tourist">Tourist</option>
-                    </select>
-            </td>
-            <td><button type="submit" class="update-btn">Update Role</button></form></td>
-        </tr>
-
-        <tr>
-            <td>USR-003</td>
-            <td>Sampath Ekanayake</td>
-            <td>sampath@lankawildtrails.lk</td>
-            <td><span class="role-badge">Safari Driver</span></td>
-            <td>
-                <form action="/update-user-role" method="POST" style="margin:0;">
-                    <input type="hidden" name="userId" value="USR-003">
-                    <select name="newRole">
-                        <option value="Operations Manager">Operations Manager</option>
-                        <option value="Tour Coordinator">Safari Tour Coordinator</option>
-                        <option value="Safari Driver" selected>Safari Driver</option>
-                        <option value="Safari Guide">Safari Guide</option>
-                        <option value="Wildlife Officer">Wildlife Info Officer</option>
-                        <option value="Cottage Manager">Park & Cottage Manager</option>
-                        <option value="Tourist">Tourist</option>
-                    </select>
-            </td>
-            <td><button type="submit" class="update-btn">Update Role</button></form></td>
-        </tr>
-
-        <tr>
-            <td>USR-004</td>
-            <td>Tharushi Fernando</td>
-            <td>tharushi@lankawildtrails.lk</td>
-            <td><span class="role-badge">Wildlife Officer</span></td>
-            <td>
-                <form action="/update-user-role" method="POST" style="margin:0;">
-                    <input type="hidden" name="userId" value="USR-004">
-                    <select name="newRole">
-                        <option value="Operations Manager">Operations Manager</option>
-                        <option value="Tour Coordinator">Safari Tour Coordinator</option>
-                        <option value="Safari Driver">Safari Driver</option>
-                        <option value="Safari Guide">Safari Guide</option>
-                        <option value="Wildlife Officer" selected>Wildlife Info Officer</option>
-                        <option value="Cottage Manager">Park & Cottage Manager</option>
-                        <option value="Tourist">Tourist</option>
-                    </select>
-            </td>
-            <td><button type="submit" class="update-btn">Update Role</button></form></td>
-        </tr>
-
-        <tr>
-            <td>USR-005</td>
-            <td>Ruwan Madushanka</td>
-            <td>ruwan@lankawildtrails.lk</td>
-            <td><span class="role-badge">Cottage Manager</span></td>
-            <td>
-                <form action="/update-user-role" method="POST" style="margin:0;">
-                    <input type="hidden" name="userId" value="USR-005">
-                    <select name="newRole">
-                        <option value="Operations Manager">Operations Manager</option>
-                        <option value="Tour Coordinator">Safari Tour Coordinator</option>
-                        <option value="Safari Driver">Safari Driver</option>
-                        <option value="Safari Guide">Safari Guide</option>
-                        <option value="Wildlife Officer">Wildlife Info Officer</option>
-                        <option value="Cottage Manager" selected>Park & Cottage Manager</option>
-                        <option value="Tourist">Tourist</option>
-                    </select>
-            </td>
-            <td><button type="submit" class="update-btn">Update Role</button></form></td>
-        </tr>
+        <tbody id="usersTableBody">
+            <tr>
+                <td colspan="6" style="text-align: center; color: #777;">Loading users...</td>
+            </tr>
         </tbody>
     </table>
 </div>
+
+<script>
+    const availableRoles = [
+        { value: "admin", label: "Operations Manager (Admin)" },
+        { value: "manager", label: "Park & Cottage Manager" },
+        { value: "guide", label: "Safari Guide" },
+        { value: "driver", label: "Safari Driver" },
+        { value: "officer", label: "Wildlife Info Officer" },
+        { value: "Tourist", label: "Tourist" }
+    ];
+
+    function showAlert(msg, isSuccess) {
+        const box = document.getElementById('alertBox');
+        box.className = 'alert ' + (isSuccess ? 'alert-success' : 'alert-error');
+        box.innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    async function loadUsers() {
+        const tbody = document.getElementById('usersTableBody');
+        try {
+            const res = await fetch('/api/user/admin/all');
+            if (!res.ok) throw new Error("Could not load users");
+            const users = await res.json();
+
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888;">No users registered yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(u => {
+                const options = availableRoles.map(r => {
+                    const isSelected = (u.role && u.role.toLowerCase() === r.value.toLowerCase()) ? "selected" : "";
+                    return `<option value="${r.value}" ${isSelected}>${r.label}</option>`;
+                }).join('');
+
+                return `
+                <tr>
+                    <td><strong>USR-${u.userId}</strong></td>
+                    <td>${u.fullName}</td>
+                    <td>${u.email}</td>
+                    <td><span class="role-badge">${u.role}</span></td>
+                    <td>
+                        <select id="roleSelect-${u.userId}">
+                            ${options}
+                        </select>
+                    </td>
+                    <td>
+                        <button class="update-btn" onclick="updateRole(${u.userId})">Update Role</button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        } catch (err) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #c0392b;">Error loading users from server.</td></tr>';
+        }
+    }
+
+    async function updateRole(userId) {
+        const select = document.getElementById('roleSelect-' + userId);
+        const newRole = select.value;
+
+        try {
+            const res = await fetch('/api/user/admin/' + userId + '/role', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: newRole })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showAlert("Role updated successfully for USR-" + userId + " to " + newRole, true);
+                loadUsers();
+            } else {
+                showAlert(data.message || "Failed to update role", false);
+            }
+        } catch (err) {
+            showAlert("Server communication error", false);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
 
 </body>
 </html>

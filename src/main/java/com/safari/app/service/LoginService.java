@@ -26,8 +26,17 @@ public class LoginService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
 
         // Verify password hash safely against database
-        if (user.getPasswordHash() != null && BCrypt.checkpw(rawPassword, user.getPasswordHash())) {
-            return user;
+        if (user.getPasswordHash() != null) {
+            String hash = user.getPasswordHash();
+            if (hash.startsWith("$2a$") || hash.startsWith("$2b$") || hash.startsWith("$2y$")) {
+                try {
+                    if (BCrypt.checkpw(rawPassword, hash)) {
+                        return user;
+                    }
+                } catch (Exception ignored) {}
+            } else if (hash.equals(rawPassword)) {
+                return user;
+            }
         }
 
         throw new IllegalArgumentException("Invalid email or password.");

@@ -3,51 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vehicle Details</title>
+    <title>Vehicle Details - Lanka Wild Trails</title>
     <style>
         body { margin: 0; font-family: Arial, sans-serif; background: #f4f7f2; color: #1f2933; }
         main { padding: 30px; } section { max-width: 900px; margin: auto; padding: 28px; background: white; border: 1px solid #d9e2d0; border-radius: 8px; }
         .eyebrow { color: #3f6b35; font-weight: bold; text-transform: uppercase; } h1 { margin-top: 0; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
         .box, .issue { padding: 14px; background: #f8fbf6; border: 1px solid #d9e2d0; border-radius: 6px; }
         span { display: block; color: #52624f; font-size: 14px; margin-bottom: 5px; }
-        a, button { display: inline-block; margin-top: 18px; margin-right: 8px; padding: 10px 14px; border: 0; border-radius: 6px; font-weight: bold; text-decoration: none; background: #3f6b35; color: white; }
+        a, button { display: inline-block; margin-top: 10px; margin-right: 8px; padding: 10px 14px; border: 0; border-radius: 6px; font-weight: bold; text-decoration: none; background: #3f6b35; color: white; cursor: pointer; }
         .secondary { background: #e8eee2; color: #2f3a2f; } .danger { background: #b42318; }
         select { padding: 10px; border: 1px solid #cbd5c0; border-radius: 6px; }
+        .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
+        .status-AVAILABLE { background: #dcfce7; color: #15803d; }
+        .status-IN_USE { background: #e0f2fe; color: #0369a1; }
+        .status-UNDER_MAINTENANCE { background: #fef3c7; color: #b45309; }
+        .status-UNAVAILABLE { background: #fee2e2; color: #b91c1c; }
+        .alert { padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
 <main>
     <section>
         <p class="eyebrow">Vehicle Management</p>
-        <h1>WP CAB-1234</h1>
+        <h1 id="regHeading">Loading Vehicle...</h1>
+
+        <div id="alertBox" class="alert"></div>
+
         <div class="grid">
-            <div class="box"><span>Vehicle ID</span><strong>1</strong></div>
-            <div class="box"><span>Registration Number</span><strong>WP CAB-1234</strong></div>
-            <div class="box"><span>Vehicle Type</span><strong>Safari Jeep</strong></div>
-            <div class="box"><span>Seating Capacity</span><strong>6</strong></div>
-            <div class="box"><span>Assigned Driver</span><strong>Nimal Perera</strong></div>
-            <div class="box"><span>Status</span><strong>AVAILABLE</strong></div>
+            <div class="box"><span>Vehicle ID</span><strong id="vId">-</strong></div>
+            <div class="box"><span>Registration Number</span><strong id="vRegNo">-</strong></div>
+            <div class="box"><span>Vehicle Type</span><strong id="vType">-</strong></div>
+            <div class="box"><span>Seating Capacity</span><strong id="vCapacity">-</strong></div>
+            <div class="box"><span>Assigned Driver</span><strong id="vDriver">-</strong></div>
+            <div class="box"><span>Status</span><strong id="vStatus">-</strong></div>
+            <div class="box" style="grid-column: 1 / -1;"><span>Description</span><p id="vDesc" style="margin:0;"></p></div>
         </div>
 
-        <p>
-            <label><strong>Quick Status Update</strong></label>
-            <select><option>AVAILABLE</option><option>IN_USE</option><option>UNDER_MAINTENANCE</option></select>
-            <button type="button">Update Status</button>
-        </p>
+        <div style="background: #f8fbf6; padding: 16px; border-radius: 6px; border: 1px solid #d9e2d0; margin-bottom: 20px;">
+            <label for="statusSelect" style="display:block; font-weight:bold; margin-bottom:8px;">Quick Status Update</label>
+            <select id="statusSelect">
+                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="IN_USE">IN_USE</option>
+                <option value="UNDER_MAINTENANCE">UNDER_MAINTENANCE</option>
+                <option value="UNAVAILABLE">UNAVAILABLE</option>
+            </select>
+            <button type="button" onclick="updateStatus()">Update Status</button>
+        </div>
 
-        <a class="secondary" href="vehicles-list.html">Back to List</a>
-        <a href="maintenance-form.html">Report Issue</a>
-        <a href="vehicle-edit.html">Edit Vehicle</a>
-        <button class="danger" type="button">Delete Vehicle</button>
+        <div>
+            <a class="secondary" href="vehicles-list.html">&larr; Back to List</a>
+            <a id="reportIssueBtn" href="#">Report Issue</a>
+            <a id="editVehicleBtn" href="#">Edit Vehicle</a>
+            <button class="danger" type="button" onclick="deleteVehicle()">Delete Vehicle</button>
+        </div>
 
-        <h2>Maintenance Issues</h2>
-        <div class="issue">
-            <h3>Brake check required</h3>
-            <p>Driver reported weak brake response during last trip.</p>
-            <p><strong>Status:</strong> OPEN | <strong>Priority:</strong> High | <strong>Reported By:</strong> Nimal</p>
+        <h2 style="margin-top: 30px; border-top: 1px solid #d9e2d0; padding-top: 20px;">Maintenance History & Issues</h2>
+        <div id="maintenanceContainer">
+            <p style="color: #777;">Loading maintenance logs...</p>
         </div>
     </section>
 </main>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const vehicleId = urlParams.get('id');
+
+    if (!vehicleId) {
+        window.location.href = "not-found.html";
+    }
+
+    function showAlert(msg, isSuccess) {
+        const box = document.getElementById('alertBox');
+        box.className = 'alert ' + (isSuccess ? 'alert-success' : 'alert-error');
+        box.innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    async function loadVehicleDetails() {
+        try {
+            const res = await fetch('/api/vehicles/' + vehicleId);
+            if (!res.ok) {
+                window.location.href = "not-found.html";
+                return;
+            }
+
+            const data = await res.json();
+            const v = data.vehicle;
+            const issues = data.maintenanceIssues || [];
+
+            document.getElementById('regHeading').innerText = v.registrationNumber;
+            document.getElementById('vId').innerText = v.id;
+            document.getElementById('vRegNo').innerText = v.registrationNumber;
+            document.getElementById('vType').innerText = v.vehicleType;
+            document.getElementById('vCapacity').innerText = v.seatingCapacity + " Passengers";
+            document.getElementById('vDriver').innerText = v.assignedDriver || "None Assigned";
+            document.getElementById('vStatus').innerHTML = `<span class="status-badge status-${v.status}">${v.status}</span>`;
+            document.getElementById('vDesc').innerText = v.description || "No description provided.";
+            document.getElementById('statusSelect').value = v.status;
+
+            document.getElementById('reportIssueBtn').href = `maintenance-form.html?vehicleId=${v.id}`;
+            document.getElementById('editVehicleBtn').href = `vehicle-edit.html?id=${v.id}`;
+
+            renderMaintenance(issues);
+        } catch (e) {
+            showAlert("Error loading vehicle details from server.", false);
+        }
+    }
+
+    function renderMaintenance(issues) {
+        const container = document.getElementById('maintenanceContainer');
+        if (!issues || issues.length === 0) {
+            container.innerHTML = '<p style="color: #888;">No maintenance issues reported for this vehicle. Fleet is operational.</p>';
+            return;
+        }
+
+        container.innerHTML = issues.map(iss => `
+            <div class="issue" style="margin-bottom: 12px;">
+                <h3 style="margin-top: 0; color: #2c3e50;">${iss.issueTitle}</h3>
+                <p style="margin: 6px 0;">${iss.description}</p>
+                <p style="margin: 0; font-size: 0.88em; color: #555;">
+                    <strong>Status:</strong> ${iss.status} |
+                    <strong>Priority:</strong> ${iss.priority} |
+                    <strong>Reported By:</strong> ${iss.reportedBy || 'Staff'} |
+                    <strong>Date:</strong> ${new Date(iss.reportedAt).toLocaleString()}
+                </p>
+            </div>
+        `).join('');
+    }
+
+    async function updateStatus() {
+        const newStatus = document.getElementById('statusSelect').value;
+        try {
+            const res = await fetch(`/api/vehicles/${vehicleId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (res.ok) {
+                showAlert("Vehicle status updated to " + newStatus, true);
+                loadVehicleDetails();
+            } else {
+                const err = await res.json();
+                showAlert(err.error || "Failed to update status", false);
+            }
+        } catch (e) {
+            showAlert("Server communication error.", false);
+        }
+    }
+
+    async function deleteVehicle() {
+        const reg = document.getElementById('vRegNo').innerText;
+        if (!confirm(`Are you sure you want to permanently delete vehicle ${reg}?`)) return;
+
+        try {
+            const res = await fetch('/api/vehicles/' + vehicleId, { method: 'DELETE' });
+            if (res.ok) {
+                alert(`Vehicle ${reg} deleted successfully.`);
+                window.location.href = "vehicles-list.html";
+            } else {
+                const err = await res.json();
+                showAlert(err.error || "Failed to delete vehicle", false);
+            }
+        } catch (e) {
+            showAlert("Server error while deleting.", false);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadVehicleDetails);
+</script>
 </body>
 </html>

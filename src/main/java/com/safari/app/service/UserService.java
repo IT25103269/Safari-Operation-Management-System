@@ -54,4 +54,17 @@ public class UserService {
         user.setPasswordHash(newHashedPassword);
         userRepository.save(user);
     }
+
+    public java.util.List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public void updateUserRole(Integer userId, String newRole) {
+        User user = getUserById(userId);
+        if (newRole == null || newRole.trim().isEmpty()) {
+            throw new IllegalArgumentException("Role cannot be empty.");
+        }
+        user.setRole(newRole.trim());
+        userRepository.save(user);
+    }
 }

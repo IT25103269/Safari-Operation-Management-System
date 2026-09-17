@@ -62,4 +62,38 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
+
+    @GetMapping("/admin/all")
+    public ResponseEntity<?> getAllUsersAdmin() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PutMapping("/admin/{id}/role")
+    public ResponseEntity<?> updateUserRole(@PathVariable Integer id, @RequestBody Map<String, String> payload) {
+        try {
+            String newRole = payload.get("role");
+            userService.updateUserRole(id, newRole);
+            return ResponseEntity.ok(Map.of("success", true, "message", "User role updated successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/admin/update-role-form")
+    public ResponseEntity<?> updateRoleForm(
+            @RequestParam("userId") String userIdStr,
+            @RequestParam("newRole") String newRole,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        try {
+            // Strip any USR- prefix if passed
+            String cleanId = userIdStr.replaceAll("[^0-9]", "");
+            Integer uid = Integer.parseInt(cleanId);
+            userService.updateUserRole(uid, newRole);
+            response.sendRedirect("/admin-user-management.html?success=true");
+            return null;
+        } catch (Exception e) {
+            response.sendRedirect("/admin-user-management.html?error=failed");
+            return null;
+        }
+    }
 }
