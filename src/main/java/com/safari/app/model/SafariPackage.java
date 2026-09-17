@@ -1,109 +1,45 @@
 package com.safari.app.model;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
 
 @Entity
-@Table(name = "SafariPackages")
+@Table(name = "Packages")
 public class SafariPackage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PackageID")
-    private Integer packageId;
+    private Long id;
 
-    @Column(name = "PackageName", nullable = false, length = 150)
-    private String packageName;
+    @Column(nullable = false, length = 100)
+    private String name;
 
-    @Column(name = "Destination", nullable = false, length = 100)
-    private String destination;
+    @Column(nullable = false)
+    private Double price;
 
-    @Column(name = "DurationDays", nullable = false)
+    @Column(length = 500)
+    private String description;
+
+    @Column(nullable = false)
     private Integer durationDays;
 
-    @Column(name = "PricePerPerson", nullable = false)
-    private Double pricePerPerson;
+    public SafariPackage() {}
 
-    @Column(name = "MaxGroupSize", nullable = false)
-    private Integer maxGroupSize;
-
-    @Column(name = "ItinerarySummary", columnDefinition = "VARCHAR(MAX)")
-    private String itinerarySummary;
-
-    @Column(name = "IncludedServices", columnDefinition = "VARCHAR(MAX)")
-    private String includedServices;
-
-    @Column(name = "Status", length = 20)
-    private String status = "Active"; // Active, Archived
-
-    @Column(name = "CreatedAt")
-    private Timestamp createdAt;
-
-    @Column(name = "UpdatedAt")
-    private Timestamp updatedAt;
-
-    public SafariPackage() {
-        this.status = "Active";
-    }
-
-    public SafariPackage(String packageName, String destination, Integer durationDays,
-                         Double pricePerPerson, Integer maxGroupSize, String itinerarySummary,
-                         String includedServices) {
-        this.packageName = packageName;
-        this.destination = destination;
+    public SafariPackage(String name, Double price, String description, Integer durationDays) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
         this.durationDays = durationDays;
-        this.pricePerPerson = pricePerPerson;
-        this.maxGroupSize = maxGroupSize;
-        this.itinerarySummary = itinerarySummary;
-        this.includedServices = includedServices;
-        this.status = "Active";
     }
 
-    @PrePersist
-    protected void onCreate() {
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        this.createdAt = now;
-        this.updatedAt = now;
-        if (this.status == null) {
-            this.status = "Active";
-        }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = new Timestamp(System.currentTimeMillis());
-    }
-
-    public Integer getPackageId() { return packageId; }
-    public void setPackageId(Integer packageId) { this.packageId = packageId; }
-
-    public String getPackageName() { return packageName; }
-    public void setPackageName(String packageName) { this.packageName = packageName; }
-
-    public String getDestination() { return destination; }
-    public void setDestination(String destination) { this.destination = destination; }
-
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
     public Integer getDurationDays() { return durationDays; }
     public void setDurationDays(Integer durationDays) { this.durationDays = durationDays; }
-
-    public Double getPricePerPerson() { return pricePerPerson; }
-    public void setPricePerPerson(Double pricePerPerson) { this.pricePerPerson = pricePerPerson; }
-
-    public Integer getMaxGroupSize() { return maxGroupSize; }
-    public void setMaxGroupSize(Integer maxGroupSize) { this.maxGroupSize = maxGroupSize; }
-
-    public String getItinerarySummary() { return itinerarySummary; }
-    public void setItinerarySummary(String itinerarySummary) { this.itinerarySummary = itinerarySummary; }
-
-    public String getIncludedServices() { return includedServices; }
-    public void setIncludedServices(String includedServices) { this.includedServices = includedServices; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public Timestamp getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
-
-    public Timestamp getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
 }

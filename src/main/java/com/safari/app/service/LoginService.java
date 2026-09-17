@@ -51,20 +51,13 @@ public class LoginService {
             return "/login.html";
         }
 
-        String r = role.trim().toLowerCase();
-        if (r.contains("admin") || r.contains("coordinator") || r.contains("operations")) {
-            return "/admin-dashboard.html";
-        } else if (r.contains("cottage") || r.contains("manager")) {
-            return "/cottage.html";
-        } else if (r.contains("guide")) {
-            return "/guide-dashboard.html";
-        } else if (r.contains("driver")) {
-            return "/driver-dashboard.html";
-        } else if (r.contains("officer") || r.contains("wildlife")) {
-            return "/view-sightings-review.html";
-        } else if (r.contains("tourist")) {
-            return "/tourist-dashboard.html";
-        }
-        return "/login.html";
+        return switch (role.trim().toLowerCase()) {
+            case "admin" -> "/admin-dashboard.html";
+            case "manager" -> "/cottage.html";
+            case "guide" -> "/guide-dashboard.html";
+            case "tourist" -> "/tourist-dashboard.html";
+            case "driver" -> "/driver-dashboard.html";
+            default -> "/login.html";
+        };
     }
 }
