@@ -1,70 +1,129 @@
 package com.safari.app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+/**
+ * Entity representing a Cottage Reservation request and its lifecycle state.
+ * Subsystem: Cottage Reservation Management (IT25101495)
+ */
 @Entity
-@Table(name = "CottageReservations")
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Table(name = "cottage_reservations")
 public class CottageReservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ReservationID")
-    private Integer id;
+    @Column(name = "reservation_id")
+    private Long id;
 
-    @Column(name = "ReservationCode", length = 50)
+    @Column(name = "reservation_code", nullable = false, unique = true, length = 50)
     private String reservationCode;
 
-    @Column(name = "CottageID", insertable = false, updatable = false)
-    private Integer cottageId;
-
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "CottageID", nullable = false)
+    @JoinColumn(name = "cottage_id", nullable = false)
     private Cottage cottage;
 
-    @Column(name = "TouristName", nullable = false, length = 100)
-    private String touristName;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @Column(name = "TouristEmail", nullable = false, length = 100)
-    private String touristEmail;
+    @Column(name = "guest_name", nullable = false, length = 100)
+    private String guestName;
 
-    @Column(name = "TouristPhone", length = 30)
-    private String touristPhone;
+    @Column(name = "guest_email", nullable = false, length = 100)
+    private String guestEmail;
 
-    @Column(name = "CheckInDate", nullable = false)
+    @Column(name = "guest_phone", nullable = false, length = 30)
+    private String guestPhone;
+
+    @Column(name = "check_in_date", nullable = false)
     private LocalDate checkInDate;
 
-    @Column(name = "CheckOutDate", nullable = false)
+    @Column(name = "check_out_date", nullable = false)
     private LocalDate checkOutDate;
 
-    @Column(name = "GuestsCount", nullable = false)
-    private Integer guestsCount = 1;
+    @Column(name = "number_of_guests", nullable = false)
+    private Integer numberOfGuests;
 
-    @Column(name = "ExtraBeds")
+    @Column(name = "extra_beds", nullable = false)
     private Integer extraBeds = 0;
 
-    @Column(name = "TotalPrice", nullable = false)
-    private Double totalPrice = 0.0;
-
-    @Column(name = "SpecialRequests", length = 500)
+    @Column(name = "special_requests", length = 500)
     private String specialRequests;
 
-    @Column(name = "Status", nullable = false, length = 30)
-    private String status = "PENDING"; // PENDING, CONFIRMED, CHECKED_IN, CHECKED_OUT, REJECTED, CANCELLED
+    @Column(name = "base_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal baseAmount = BigDecimal.ZERO;
 
-    @Column(name = "CreatedAt", updatable = false)
-    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+    @Column(name = "extra_bed_fee", nullable = false, precision = 10, scale = 2)
+    private BigDecimal extraBedFee = BigDecimal.ZERO;
 
-    public CottageReservation() {}
+    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalAmount = BigDecimal.ZERO;
 
-    public Integer getId() {
+    @Column(name = "paid_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal paidAmount = BigDecimal.ZERO;
+
+    @Column(name = "refund_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal refundAmount = BigDecimal.ZERO;
+
+    @Column(name = "status", nullable = false, length = 30)
+    private String status = "PENDING"; // PENDING, CONFIRMED, CHECKED_IN, CHECKED_OUT, CANCELLED, REJECTED
+
+    @Column(name = "cancellation_reason", length = 500)
+    private String cancellationReason;
+
+    @Column(name = "manager_notes", length = 500)
+    private String managerNotes;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    public CottageReservation() {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = "PENDING";
+        }
+        if (this.extraBeds == null) {
+            this.extraBeds = 0;
+        }
+        if (this.baseAmount == null) {
+            this.baseAmount = BigDecimal.ZERO;
+        }
+        if (this.extraBedFee == null) {
+            this.extraBedFee = BigDecimal.ZERO;
+        }
+        if (this.totalAmount == null) {
+            this.totalAmount = BigDecimal.ZERO;
+        }
+        if (this.paidAmount == null) {
+            this.paidAmount = BigDecimal.ZERO;
+        }
+        if (this.refundAmount == null) {
+            this.refundAmount = BigDecimal.ZERO;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // Getters and Setters
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -76,14 +135,6 @@ public class CottageReservation {
         this.reservationCode = reservationCode;
     }
 
-    public Integer getCottageId() {
-        return cottageId;
-    }
-
-    public void setCottageId(Integer cottageId) {
-        this.cottageId = cottageId;
-    }
-
     public Cottage getCottage() {
         return cottage;
     }
@@ -92,55 +143,36 @@ public class CottageReservation {
         this.cottage = cottage;
     }
 
-    public String getTouristName() {
-        return touristName;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setTouristName(String touristName) {
-        this.touristName = touristName;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    // Alias for frontend
     public String getGuestName() {
-        return touristName;
+        return guestName;
     }
 
     public void setGuestName(String guestName) {
-        this.touristName = guestName;
+        this.guestName = guestName;
     }
 
-    public String getTouristEmail() {
-        return touristEmail;
-    }
-
-    public void setTouristEmail(String touristEmail) {
-        this.touristEmail = touristEmail;
-    }
-
-    // Alias for frontend
     public String getGuestEmail() {
-        return touristEmail;
+        return guestEmail;
     }
 
     public void setGuestEmail(String guestEmail) {
-        this.touristEmail = guestEmail;
+        this.guestEmail = guestEmail;
     }
 
-    public String getTouristPhone() {
-        return touristPhone;
-    }
-
-    public void setTouristPhone(String touristPhone) {
-        this.touristPhone = touristPhone;
-    }
-
-    // Alias for frontend
     public String getGuestPhone() {
-        return touristPhone;
+        return guestPhone;
     }
 
     public void setGuestPhone(String guestPhone) {
-        this.touristPhone = guestPhone;
+        this.guestPhone = guestPhone;
     }
 
     public LocalDate getCheckInDate() {
@@ -159,21 +191,12 @@ public class CottageReservation {
         this.checkOutDate = checkOutDate;
     }
 
-    public Integer getGuestsCount() {
-        return guestsCount;
-    }
-
-    public void setGuestsCount(Integer guestsCount) {
-        this.guestsCount = guestsCount;
-    }
-
-    // Alias for frontend
     public Integer getNumberOfGuests() {
-        return guestsCount;
+        return numberOfGuests;
     }
 
     public void setNumberOfGuests(Integer numberOfGuests) {
-        this.guestsCount = numberOfGuests;
+        this.numberOfGuests = numberOfGuests;
     }
 
     public Integer getExtraBeds() {
@@ -184,29 +207,52 @@ public class CottageReservation {
         this.extraBeds = extraBeds;
     }
 
-    public Double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(Double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    // Alias for frontend
-    public Double getTotalAmount() {
-        return totalPrice;
-    }
-
-    public void setTotalAmount(Double totalAmount) {
-        this.totalPrice = totalAmount;
-    }
-
     public String getSpecialRequests() {
         return specialRequests;
     }
 
     public void setSpecialRequests(String specialRequests) {
         this.specialRequests = specialRequests;
+    }
+
+    public BigDecimal getBaseAmount() {
+        return baseAmount;
+    }
+
+    public void setBaseAmount(BigDecimal baseAmount) {
+        this.baseAmount = baseAmount;
+    }
+
+    public BigDecimal getExtraBedFee() {
+        return extraBedFee;
+    }
+
+    public void setExtraBedFee(BigDecimal extraBedFee) {
+        this.extraBedFee = extraBedFee;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public BigDecimal getPaidAmount() {
+        return paidAmount;
+    }
+
+    public void setPaidAmount(BigDecimal paidAmount) {
+        this.paidAmount = paidAmount;
+    }
+
+    public BigDecimal getRefundAmount() {
+        return refundAmount;
+    }
+
+    public void setRefundAmount(BigDecimal refundAmount) {
+        this.refundAmount = refundAmount;
     }
 
     public String getStatus() {
@@ -217,11 +263,41 @@ public class CottageReservation {
         this.status = status;
     }
 
-    public Timestamp getCreatedAt() {
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
+    }
+
+    public String getManagerNotes() {
+        return managerNotes;
+    }
+
+    public void setManagerNotes(String managerNotes) {
+        this.managerNotes = managerNotes;
+    }
+
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    /** Browser-download endpoint for the generated reservation receipt. */
+    @com.fasterxml.jackson.annotation.JsonProperty("receiptUrl")
+    public String getReceiptUrl() {
+        return id == null ? null : "/api/cottages/reservations/" + id + "/receipt";
     }
 }
